@@ -99,7 +99,7 @@ in
 
   services.oauth2_proxy = {
     email.domains = [ "disciplina.io" ];
-    keyFile = toString config.serokell.keys.oauth2_proxy;
+    keyFile = toString config.dscp.keys.oauth2_proxy;
   };
 
   services.nixosManual.enable = false;
@@ -122,7 +122,7 @@ in
     passwordAuthentication = false;
   };
 
-  serokell.keys = {
+  dscp.keys = {
     tarsnap = lib.mkIf config.services.tarsnap.enable {
       keyname = "tarsnap/${name}.rw";
       services = map (x: "tarsnap-${x}") (builtins.attrNames config.services.tarsnap.archives);

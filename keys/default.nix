@@ -1,5 +1,5 @@
 { lib, config, deploymentName, ...}: with lib; {
-  options.serokell = {
+  options.dscp = {
     keydir = mkOption {
       type = types.nullOr types.string;
     };
@@ -36,23 +36,23 @@
     };
   };
   config =
-    let toPath = value: with value; ./. + "/${lib.optionalString (!shared) (config.serokell.keydir + "/")}/${keyname}.${extension}";
+    let toPath = value: with value; ./. + "/${lib.optionalString (!shared) (config.dscp.keydir + "/")}/${keyname}.${extension}";
 in
-  mkIf (config.serokell.keydir != null) {
+  mkIf (config.dscp.keydir != null) {
     assertions = lib.mapAttrsToList (name: value: {
       assertion = builtins.pathExists (toPath value);
       message = "key ${toPath value} doesn't exist";
-    }) config.serokell.keys;
+    }) config.dscp.keys;
 
     deployment.keys = (lib.mapAttrs (name: value: {
       keyFile = toPath value;
       user = mkIf (value.user != null) value.user;
-    }) config.serokell.keys);
+    }) config.dscp.keys);
 
     systemd.services = lib.mkMerge (lib.mapAttrsToList (name: { services, ...}@val: lib.genAttrs services (service: rec {
       requires = [ "${name}-key.service" ];
       after = requires;
       restartTriggers = [ (toString val) ];
-    })) config.serokell.keys);
+    })) config.dscp.keys);
   };
 }

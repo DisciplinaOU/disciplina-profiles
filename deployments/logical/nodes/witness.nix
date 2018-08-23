@@ -1,4 +1,4 @@
 { config, lib, pkgs, ... }:
-let keys = config.serokell.keys; in
+let keys = config.dscp.keys; in
 {
 }

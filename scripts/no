@@ -8,7 +8,7 @@ STATEFILE="${NO_STATEFILE:-state.nixops}"
 LOCKFILE="${NO_LOCKFILE:-nixops-lock}"
 # LOGFILE="${NO_LOGFILE:-log}"
 REMOTED="${NO_REMOTEDIR:-/home/nixops}"
-REMOTEHOST="${NO_REMOTEHOST:-nixops@deployer.serokell.team}"
+REMOTEHOST="${NO_REMOTEHOST:-nixops@deployer.discplina.io}"
 
 if [[ ! -z "${NO_LOCALDIR:-}" ]]; then
     LOCALD="$NO_LOCALDIR"
