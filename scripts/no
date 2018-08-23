@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# Enable strict mode, noclobber
+set -euo pipefail
+set -o noclobber
+
+## Options and their defaults
+STATEFILE="${NO_STATEFILE:-state.nixops}"
+LOCKFILE="${NO_LOCKFILE:-nixops-lock}"
+# LOGFILE="${NO_LOGFILE:-log}"
+REMOTED="${NO_REMOTEDIR:-/home/nixops}"
+REMOTEHOST="${NO_REMOTEHOST:-nixops@deployer.serokell.team}"
+
+if [[ ! -z "${NO_LOCALDIR:-}" ]]; then
+    LOCALD="$NO_LOCALDIR"
+    DISMOUNT=false
+else
+    LOCALD="$(mktemp -d)"
+    DISMOUNT=true
+fi
+
+## Misc variables
+STATEP="$LOCALD/$STATEFILE"
+LOCKP="$LOCALD/$LOCKFILE"
+# LOGP="$LOCALD/$LOGFILE"
+
+## FIXME: Include AWS Key ID in lockfile for unique user identification
+LOCKTEXT="$(whoami) -- $(date +'%Y%m%d.%H%M') -- $*"
+
+## Mount if not already
+if ! mountpoint -q "$LOCALD"; then
+    sshfs "$REMOTEHOST:$REMOTED" "$LOCALD" -o cache=no,reconnect
+fi
+
+## If the mountpoint was a tempdir, clean it up
+function cleanup() {
+    if [[ "$DISMOUNT" = true ]]; then
+        fusermount -u "$LOCALD"
+        rm -rf "$LOCALD"
+    fi
+}
+trap cleanup INT TERM EXIT
+
+## Try to acquire lock
+if ! (echo "$LOCKTEXT" > "$LOCKP"); then
+    echo 'Found remote lock:'
+    cat "$LOCKP"
+    exit 1
+fi
+
+## Remove the lock after ourselves
+function unlock() {
+    rm -f "$LOCKP"
+    cleanup
+}
+trap unlock INT TERM EXIT
+
+## Add a log entry
+echo "$LOCKTEXT" >> "$LOCALD/log"
+
+## Point Nixops at the statefile on the remote FS
+export NIXOPS_STATE="$STATEP"
+
+## Git revision info
+GITDESC=$(git describe --all --dirty)
+GITREV=$(git rev-parse --verify HEAD)
+export GITDESC GITREV
+
+## Execute nixops
+nixops "$@"
+
+# vim: set ft=sh:

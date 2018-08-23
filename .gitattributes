@@ -1,0 +1,2 @@
+*.key filter=git-crypt diff=git-crypt
+keys/*/ssl/** filter=git-crypt diff=git-crypt
