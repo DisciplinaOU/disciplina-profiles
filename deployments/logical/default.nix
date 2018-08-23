@@ -3,5 +3,7 @@
   network.enableRollback = true;
   defaults = import ../../modules;
 
-  witness = import ./nodes/witness.nix;
+  witness1 = import ./nodes/witness.nix { n = 1; };
+  witness2 = import ./nodes/witness.nix { n = 2; };
+  witness3 = import ./nodes/witness.nix { n = 3; };
 }

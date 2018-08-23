@@ -35,24 +35,25 @@
       default = {};
     };
   };
+
   config =
     let toPath = value: with value; ./. + "/${lib.optionalString (!shared) (config.dscp.keydir + "/")}/${keyname}.${extension}";
-in
-  mkIf (config.dscp.keydir != null) {
-    assertions = lib.mapAttrsToList (name: value: {
-      assertion = builtins.pathExists (toPath value);
-      message = "key ${toPath value} doesn't exist";
-    }) config.dscp.keys;
+    in
+      mkIf (config.dscp.keydir != null) {
+        assertions = lib.mapAttrsToList (name: value: {
+          assertion = builtins.pathExists (toPath value);
+          message = "key ${toPath value} doesn't exist";
+        }) config.dscp.keys;
 
-    deployment.keys = (lib.mapAttrs (name: value: {
-      keyFile = toPath value;
-      user = mkIf (value.user != null) value.user;
-    }) config.dscp.keys);
+        deployment.keys = (lib.mapAttrs (name: value: {
+          keyFile = toPath value;
+          user = mkIf (value.user != null) value.user;
+        }) config.dscp.keys);
 
-    systemd.services = lib.mkMerge (lib.mapAttrsToList (name: { services, ...}@val: lib.genAttrs services (service: rec {
-      requires = [ "${name}-key.service" ];
-      after = requires;
-      restartTriggers = [ (toString val) ];
-    })) config.dscp.keys);
-  };
+        systemd.services = lib.mkMerge (lib.mapAttrsToList (name: { services, ...}@val: lib.genAttrs services (service: rec {
+          requires = [ "${name}-key.service" ];
+          after = requires;
+          restartTriggers = [ (toString val) ];
+        })) config.dscp.keys);
+      };
 }
