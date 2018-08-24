@@ -13,7 +13,7 @@ let keys = config.dscp.keys; in
     package = pkgs.buildkite-agent3;
     runtimePackages = with pkgs; [
       # Basics
-      bash nix tar gunzip
+      bash nix gnutar gunzip
       # git checkout fails without this because .gitattributes defines it as clean/smudge filter
       git-crypt
     ];
