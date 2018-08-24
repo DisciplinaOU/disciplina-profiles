@@ -5,6 +5,6 @@ steps:
       queue: dscp
 
   - label: nixops
-    command: nix-shell --run 'env'
+    command: nix-shell --run 'nixops list'
     agents:
       queue: dscp
