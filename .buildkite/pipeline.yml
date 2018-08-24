@@ -1,8 +1,10 @@
 steps:
-  - label: build
-    command: nix-shell --run 'nix-build -I ssh-key=$HOME/.ssh/id_rsa -A dscp-servers'
-    agents:
-      queue: dscp
+  # - label: build
+  #   command:
+  #     - nix-shell --run 'git crypt unlock'
+  #     - nix-shell --run 'nix-build -I ssh-key=$HOME/.ssh/id_rsa -A dscp-servers'
+  #   agents:
+  #     queue: dscp
 
   - label: nixops
     command:
