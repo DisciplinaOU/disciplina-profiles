@@ -1,5 +1,7 @@
 # Disciplina Cluster Configuration
 
+[![Build status](https://badge.buildkite.com/cad2c06e89f0d975e7b4242154fe3d40d430de5bd24b565eaf.svg)](https://buildkite.com/serokell/dscp-staging)
+
 The contents of this repository describe and configure the Disciplina cluster.
 AWS resource management and system configuration are declared in Nix and
 deployed with nixops.
