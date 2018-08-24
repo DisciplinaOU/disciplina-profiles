@@ -105,6 +105,12 @@ Host tmp.builder
   hostname ec2-13-231-105-137.ap-northeast-1.compute.amazonaws.com
 ```
 
+And also that rebooting the builder node will close the sshfs connection,
+making the nixops statefile evaporate mid-run. This is bad, as you might have
+guessed. If you need to reboot the builder, for example to change instance
+types, copy the statefile onto your computer first, then copy it back when the
+builder is back up.
+
 ## Deploying the builder
 
 There are three bits of state that nixops can not replicate from scratch easily.
