@@ -26,6 +26,21 @@ let keys = config.dscp.keys; in
     '';
   };
 
+  # Make sure admins can read/write the nixops state file to allow wrapper script access
+  users.extraGroups.nixops = {};
+  users.extraUsers.buildkite-agent.extraGroups = [ "nixops" ];
+  system.activationScripts.nixops = {
+    deps = [];
+    text = ''
+      chgrp nixops /var/lib/buildkite-agent
+      chmod g+rwx /var/lib/buildkite-agent
+
+      chgrp -R nixops /var/lib/buildkite-agent/.nixops
+      chmod -R g+rw /var/lib/buildkite-agent/.nixops
+      chmod g+rwx /var/lib/buildkite-agent/.nixops
+    '';
+  };
+
   dscp.keys = {
     buildkite-token =       { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
     buildkite-ssh-private = { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };

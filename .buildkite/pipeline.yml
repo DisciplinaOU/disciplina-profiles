@@ -10,6 +10,9 @@ steps:
     command:
       # This is fun when it needs to restart the BK agent service =)
       # - nix-shell --run 'nixops deploy -d dscp-stg --include builder'
+
+      # Abort if the statefile is locked by wrapper script
+      - stat /var/lib/buildkite-agent/.nixops/nixops-lock && exit 1
       - nix-shell --run 'nixops deploy -d dscp-tmp --exclude builder --allow-reboot'
     timeout_in_minutes: 180
     branches: master
