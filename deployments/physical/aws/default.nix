@@ -24,7 +24,7 @@
 
     deployment.route53 = {
       inherit accessKeyId;
-      usePublicDNSName = true;
+      usePublicDNSName = lib.mkDefault false;
       hostName =  "${config.networking.hostName}.${domain}";
     };
 

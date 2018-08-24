@@ -36,7 +36,6 @@ demo:
   services.openssh.ports = lib.mkForce [ 22 ];
   services.nginx = {
     enable = true;
-    # openFirewall = true;
     virtualHosts.witness = {
       serverName = config.networking.hostName;
       locations."/".proxyPass = "http://localhost:4030";
