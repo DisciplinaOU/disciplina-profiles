@@ -11,7 +11,7 @@ in
 
 stdenv.mkDerivation {
   name = "dscp-ops-env";
-  buildInputs = with pkgs; [ nixops-git git-crypt ];
+  buildInputs = with pkgs; [ nixops-git git-crypt sshfs ];
 
   NIX_PATH = builtins.concatStringsSep ":" [
     "nixpkgs=${toString pkgs.path}"
