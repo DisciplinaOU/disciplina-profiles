@@ -13,6 +13,10 @@ Anything you need done can be done by changing the appropriate Nix declarations
 and redeploying with nixops. State inconsistencies will lead to problems! You
 have been warned.
 
+## TMP AWS Console
+
+Log in at https://857172137115.signin.aws.amazon.com/console
+
 ## Nix and Nixops
 
 From the Nix homepage:
@@ -88,6 +92,18 @@ for you.
 Still, there are situations where you will want to do things manually. In this
 case, you will want to copy `deployments.nixops` from the CI runner, and specify
 the path as `nixops -s /path/to/deployments.nixops <all other args/commands>`.
+
+This is simplified by the script in `scripts/no` which will mount the remote
+folder and point nixops at the state file in it. Just use it as a nixops
+replacement, for example `scripts/no deploy -d dscp-production --include
+builder`.
+
+Bear in mind that you need the following in your `~/.ssh/config`:
+
+```
+Host tmp.builder
+  hostname ec2-13-231-105-137.ap-northeast-1.compute.amazonaws.com
+```
 
 ## Deploying the builder
 
