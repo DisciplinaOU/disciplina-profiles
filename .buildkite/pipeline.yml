@@ -2,6 +2,7 @@ steps:
   - label: build
     command:
       - nix-shell --run 'nix-build -I ssh-key=$HOME/.ssh/id_rsa -A dscp-servers'
+    timeout_in_minutes: 180
     agents:
       queue: dscp
 
@@ -11,6 +12,7 @@ steps:
       # - nix-shell --run 'nixops deploy -d dscp-stg --include builder'
       - nix-shell --run 'nixops deploy -d dscp-stg --exclude builder --allow-reboot'
       # - nix-shell --run 'nixops deploy -d dscp-stg --include witness-internal --allow-reboot'
+    timeout_in_minutes: 180
     branches: develop
     agents:
       queue: dscp
