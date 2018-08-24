@@ -39,13 +39,10 @@
       securityGroups = [];
       subnetId = lib.mkForce resources.vpcSubnets.dscp-subnet;
     };
-
-    # services.tarsnap.enable = backups && config.services.tarsnap.archives != {};
-    # services.tarsnap.keyfile = toString config.dscp.keys.tarsnap;
   };
 
-  # witness1 = import ./nodes/witness.nix { inherit realDomain region; num = 1; };
-  # witness2 = import ./nodes/witness.nix { inherit realDomain region; num = 2; };
-  # witness3 = import ./nodes/witness.nix { inherit realDomain region; num = 3; };
+  witness1 = import ./nodes/witness.nix { inherit realDomain region; num = 1; };
+  witness2 = import ./nodes/witness.nix { inherit realDomain region; num = 2; };
+  witness3 = import ./nodes/witness.nix { inherit realDomain region; num = 3; };
   builder = import ./nodes/builder.nix;
 }

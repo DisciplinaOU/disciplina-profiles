@@ -22,5 +22,6 @@ let keys = config.dscp.keys; in
     buildkite-token =       { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
     buildkite-ssh-private = { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
     buildkite-ssh-public =  { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
+    aws-credentials =   rec { services = [ "buildkite-agent" ]; user = "buildkite-agent"; shared = false; } ;
   };
 }

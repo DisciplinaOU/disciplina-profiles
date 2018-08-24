@@ -88,3 +88,14 @@ for you.
 Still, there are situations where you will want to do things manually. In this
 case, you will want to copy `deployments.nixops` from the CI runner, and specify
 the path as `nixops -s /path/to/deployments.nixops <all other args/commands>`.
+
+## Deploying the builder
+
+There are two bits of state that nixops can not replicate from scratch easily.
+One is the nixops state file itself, which needs to exist on the builder so
+that CI can run nixops for us. This needs to live in
+`/var/lib/buildkite-agent/.nixops/deployments.nixops`.
+
+The second is a symlink from `/var/lib/buildkite-agent/.aws/credentials` to
+`/run/keys/aws-credentials`. Nixops seems to have forgotten how to use the
+`deployment.keys.foo.path` option, so manually symlinking it will have to do.
