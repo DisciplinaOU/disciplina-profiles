@@ -44,7 +44,8 @@
     # services.tarsnap.keyfile = toString config.dscp.keys.tarsnap;
   };
 
-  witness1 = import ./nodes/witness.nix { inherit realDomain; num = 1; region = "ap-southeast-1"; }; # singapore
-  witness2 = import ./nodes/witness.nix { inherit realDomain; num = 2; region = "eu-west-2";      }; # london
-  witness3 = import ./nodes/witness.nix { inherit realDomain; num = 3; region = "us-east-1";      }; # n. virginia
+  # witness1 = import ./nodes/witness.nix { inherit realDomain region; num = 1; };
+  # witness2 = import ./nodes/witness.nix { inherit realDomain region; num = 2; };
+  # witness3 = import ./nodes/witness.nix { inherit realDomain region; num = 3; };
+  builder = import ./nodes/builder.nix;
 }
