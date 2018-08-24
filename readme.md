@@ -91,7 +91,7 @@ the path as `nixops -s /path/to/deployments.nixops <all other args/commands>`.
 
 ## Deploying the builder
 
-There are two bits of state that nixops can not replicate from scratch easily.
+There are three bits of state that nixops can not replicate from scratch easily.
 One is the nixops state file itself, which needs to exist on the builder so
 that CI can run nixops for us. This needs to live in
 `/var/lib/buildkite-agent/.nixops/deployments.nixops`.
@@ -99,3 +99,31 @@ that CI can run nixops for us. This needs to live in
 The second is a symlink from `/var/lib/buildkite-agent/.aws/credentials` to
 `/run/keys/aws-credentials`. Nixops seems to have forgotten how to use the
 `deployment.keys.foo.path` option, so manually symlinking it will have to do.
+
+The third is a GnuPG keyring that includes the private key in
+`keys/buildkite-gpg-private.key`, which is needed in order to unlock the crypt
+vault.
+
+### Creating a keyring
+
+```sh
+# First, make sure the vault is unlocked
+$ git crypt unlock
+
+# Create a temporary gnupg home dir so we get an empty keyring on import
+$ export GNUPGHOME=$(mktemp -d) ; echo $GNUPGHOME
+$ gnupg --import keys/buildkite-gpg-private.key
+
+# Mount the server folder and transfer the keyring
+$ mkdir builder-remote
+$ nixops mount -d dscp-stg builder:/var/lib/buildkite-agent builder-remote
+$ cp -r $GNUPGHOME builder-remote/.gnupg
+
+# SSH into the builder to fix the permissions and ownership
+$ nixops ssh -d dscp-stg builder
+
+# And now on the builder
+$ cd /var/lib/buildkite-agent
+$ chown -R buildkite-agent:nogroup .gnupg
+$ chmod -R go-rwx .gnupg
+```
