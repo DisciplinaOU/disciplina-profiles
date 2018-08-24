@@ -68,6 +68,7 @@ rec {
     gatewayId = resources.vpcInternetGateways.dscp-igw;
   };
   ec2KeyPairs.default = {
+    name = "dscp-kp";
     inherit accessKeyId region;
   };
 }
