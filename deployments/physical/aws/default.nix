@@ -41,8 +41,8 @@
     };
   };
 
-  witness1 = import ./nodes/witness.nix { inherit realDomain region; num = 1; };
-  witness2 = import ./nodes/witness.nix { inherit realDomain region; num = 2; };
-  witness3 = import ./nodes/witness.nix { inherit realDomain region; num = 3; };
+  witness1 = import ./nodes/witness.nix;
+  witness2 = import ./nodes/witness.nix;
+  witness3 = import ./nodes/witness.nix;
   builder = import ./nodes/builder.nix;
 }
