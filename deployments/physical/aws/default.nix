@@ -1,4 +1,4 @@
-{ accessKeyId, domain, region, zone, realDomain, backups ? false, keydir }:
+{ accessKeyId, domain ? null, region, zone, realDomain ? null, backups ? false, keydir }:
 
 {
   resources = (import ./resources.nix {
@@ -22,7 +22,7 @@
     ];
     dscp = { inherit keydir; };
 
-    deployment.route53 = {
+    deployment.route53 = lib.mkIf (domain != null) {
       inherit accessKeyId;
       usePublicDNSName = lib.mkDefault false;
       hostName =  "${config.networking.hostName}.${domain}";
