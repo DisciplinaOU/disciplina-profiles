@@ -1,6 +1,9 @@
 { config, lib, pkgs, ... }:
 let keys = config.dscp.keys; in
 {
+  # stack2nix <3
+  nix.useSandbox = false;
+
   services.buildkite-agent = {
     enable = true;
     name = "dscp-runner";
