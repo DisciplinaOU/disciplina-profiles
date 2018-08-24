@@ -4,6 +4,9 @@ let keys = config.dscp.keys; in
   # stack2nix <3
   nix.useSandbox = false;
 
+  # To copy closures around
+  nix.trustedUsers = [ "chris" ];
+
   services.buildkite-agent = {
     enable = true;
     name = "dscp-runner";
