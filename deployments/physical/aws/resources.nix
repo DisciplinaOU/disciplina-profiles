@@ -14,26 +14,62 @@ rec {
   {
     inherit region accessKeyId zone;
     vpcId = resources.vpc.dscp-vpc;
-    cidrBlock = "10.0.0.0/19";
+    cidrBlock = "10.0.44.0/24";
     mapPublicIpOnLaunch = true;
   };
 
-  ec2SecurityGroups.dscp-sg =
+  ec2SecurityGroups.dscp-default-sg =
   { resources, lib, ... }:
   {
     inherit region accessKeyId;
     vpcId = resources.vpc.dscp-vpc;
     rules = [
-      { fromPort =    22; toPort =    22; sourceIp = "0.0.0.0/0"; }
-      { fromPort =    80; toPort =    80; sourceIp = "0.0.0.0/0"; }
-      { fromPort =   443; toPort =   443; sourceIp = "0.0.0.0/0"; }
-      # Witness node
-      { fromPort =  4010; toPort =  4010; sourceIp = "0.0.0.0/0"; }
-      # prometheus node exporter
-      # TODO: allow from Jupiter
+      # Prometheus node exporter
       { fromPort =  9100; toPort =  9100; sourceIp = vpc.dscp-vpc.cidrBlock; }
-      # mosh
-      { fromPort = 60000; toPort = 60010; protocol = "udp"; sourceIp = "0.0.0.0/0"; }
+    ];
+  };
+
+  ec2SecurityGroups.dscp-ssh-private-sg =
+  { resources, lib, ... }:
+  {
+    inherit region accessKeyId;
+    vpcId = resources.vpc.dscp-vpc;
+    rules = [
+      # SSH
+      { fromPort =    22; toPort =    22; sourceIp = vpc.dscp-vpc.cidrBlock; }
+    ];
+  };
+
+  ec2SecurityGroups.dscp-ssh-public-sg =
+  { resources, lib, ... }:
+  {
+    inherit region accessKeyId;
+    vpcId = resources.vpc.dscp-vpc;
+    rules = [
+      # SSH
+      { fromPort =    22; toPort =    22; sourceIp = "0.0.0.0/0"; }
+    ];
+  };
+
+  ec2SecurityGroups.dscp-witness-public-sg =
+  { resources, lib, ... }:
+  {
+    inherit region accessKeyId;
+    vpcId = resources.vpc.dscp-vpc;
+    rules = [
+      # Disciplina witness
+      { fromPort =  4010; toPort =  4010; sourceIp = "0.0.0.0/0"; }
+    ];
+  };
+
+  ec2SecurityGroups.dscp-witness-private-sg =
+  { resources, lib, ... }:
+  {
+    inherit region accessKeyId;
+    vpcId = resources.vpc.dscp-vpc;
+    rules = [
+      # Disciplina witness
+      { fromPort =  4010; toPort =  4010; sourceIp = vpc.dscp-vpc.cidrBlock; }
     ];
   };
 

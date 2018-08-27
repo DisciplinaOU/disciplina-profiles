@@ -35,14 +35,15 @@
       associatePublicIpAddress = lib.mkDefault true;
       ebsInitialRootDiskSize = lib.mkDefault 50;
       keyPair = resources.ec2KeyPairs.default;
-      securityGroupIds = [ resources.ec2SecurityGroups.dscp-sg.name ];
+      securityGroupIds = [ resources.ec2SecurityGroups.dscp-default-sg.name ];
       securityGroups = [];
       subnetId = lib.mkForce resources.vpcSubnets.dscp-subnet;
     };
   };
 
-  witness1 = import ./nodes/witness.nix;
-  witness2 = import ./nodes/witness.nix;
-  witness3 = import ./nodes/witness.nix;
+  witness0 = import ./nodes/witness.nix { internal = true; };
+  witness1 = import ./nodes/witness.nix { };
+  witness2 = import ./nodes/witness.nix { };
+  witness3 = import ./nodes/witness.nix { };
   builder = import ./nodes/builder.nix;
 }
