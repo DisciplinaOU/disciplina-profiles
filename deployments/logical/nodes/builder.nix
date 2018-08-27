@@ -62,6 +62,12 @@ let keys = config.dscp.keys; in
       commands = [
         { command = "${pkgs.nixops-git}/bin/nixops deploy *";
           options = [ "SETENV" "NOPASSWD" ]; }
+        { command = "${pkgs.nixops-git}/bin/nixops info";
+          options = [ "SETENV" "NOPASSWD" ]; }
+        { command = "${pkgs.nixops-git}/bin/nixops list";
+          options = [ "SETENV" "NOPASSWD" ]; }
+        { command = "${pkgs.nixops-git}/bin/nixops check";
+          options = [ "SETENV" "NOPASSWD" ]; }
       ];
       groups = [ "wheel" "nixops" ];
       users = [ "buildkite-agent" ];
