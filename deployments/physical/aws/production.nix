@@ -1,9 +1,9 @@
 import ./. rec {
-  accessKeyId = "srk-tmp";
-  backups = true;
-  domain = "disciplina.io";
+  accessKeyId = "teachmeplease";
+  # backups = true;
+  # domain = "disciplina.io";
+  # realDomain = "disciplina.io";
   keydir = "production";
-  realDomain = "disciplina.io";
-  region = "eu-west-2";
+  region = "ap-northeast-1"; # Tokyo
   zone = "${region}a";
 }

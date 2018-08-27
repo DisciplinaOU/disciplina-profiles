@@ -4,11 +4,11 @@ set -euo pipefail
 set -o noclobber
 
 ## Options and their defaults
-STATEFILE="${NO_STATEFILE:-state.nixops}"
+STATEFILE="${NO_STATEFILE:-deployments.nixops}"
 LOCKFILE="${NO_LOCKFILE:-nixops-lock}"
 # LOGFILE="${NO_LOGFILE:-log}"
-REMOTED="${NO_REMOTEDIR:-/home/nixops}"
-REMOTEHOST="${NO_REMOTEHOST:-nixops@deployer.discplina.io}"
+REMOTED="${NO_REMOTEDIR:-/var/lib/buildkite-agent/.nixops}"
+REMOTEHOST="${NO_REMOTEHOST:-tmp.builder}"
 
 if [[ ! -z "${NO_LOCALDIR:-}" ]]; then
     LOCALD="$NO_LOCALDIR"

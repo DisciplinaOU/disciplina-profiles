@@ -1,10 +1,20 @@
 steps:
   - label: build
-    command: nix-shell --run 'nix-build -I ssh-key=$HOME/.ssh/id_rsa -A dscp-servers'
+    command:
+      - nix-shell --run 'nix-build -I ssh-key=$HOME/.ssh/id_rsa -A dscp-servers'
+    timeout_in_minutes: 180
     agents:
       queue: dscp
 
   - label: nixops
-    command: nix-shell --run 'nixops list'
+    command:
+      # This is fun when it needs to restart the BK agent service =)
+      # - nix-shell --run 'nixops deploy -d dscp-stg --include builder'
+
+      # Abort if the statefile is locked by wrapper script
+      - stat /var/lib/buildkite-agent/.nixops/nixops-lock && exit 1
+      - nix-shell --run 'nixops deploy -d dscp-tmp --exclude builder --allow-reboot'
+    timeout_in_minutes: 180
+    branches: master
     agents:
       queue: dscp

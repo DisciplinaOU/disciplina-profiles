@@ -3,7 +3,7 @@
 let
   wheel = [ "chris" "kirelagin" "yegortimoshenko" "yorick" ];
   expandUser = _name: keys: {
-    extraGroups = (lib.optional (builtins.elem _name wheel) "wheel") ++ [ "systemd-journal" ];
+    extraGroups = (lib.optional (builtins.elem _name wheel) "wheel") ++ [ "systemd-journal" "nixops" ];
     isNormalUser = true;
     openssh.authorizedKeys.keys = keys;
   };

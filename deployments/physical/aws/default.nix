@@ -1,4 +1,4 @@
-{ accessKeyId, domain, region, zone, realDomain, backups ? false, keydir }:
+{ accessKeyId, domain ? null, region, zone, realDomain ? null, backups ? false, keydir }:
 
 {
   resources = (import ./resources.nix {
@@ -22,9 +22,9 @@
     ];
     dscp = { inherit keydir; };
 
-    deployment.route53 = {
+    deployment.route53 = lib.mkIf (domain != null) {
       inherit accessKeyId;
-      usePublicDNSName = true;
+      usePublicDNSName = lib.mkDefault false;
       hostName =  "${config.networking.hostName}.${domain}";
     };
 
@@ -39,13 +39,10 @@
       securityGroups = [];
       subnetId = lib.mkForce resources.vpcSubnets.dscp-subnet;
     };
-
-    # services.tarsnap.enable = backups && config.services.tarsnap.archives != {};
-    # services.tarsnap.keyfile = toString config.dscp.keys.tarsnap;
   };
 
-  # witness1 = import ./nodes/witness.nix { inherit realDomain region; num = 1; };
-  # witness2 = import ./nodes/witness.nix { inherit realDomain region; num = 2; };
-  # witness3 = import ./nodes/witness.nix { inherit realDomain region; num = 3; };
+  witness1 = import ./nodes/witness.nix;
+  witness2 = import ./nodes/witness.nix;
+  witness3 = import ./nodes/witness.nix;
   builder = import ./nodes/builder.nix;
 }

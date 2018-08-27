@@ -13,6 +13,10 @@ Anything you need done can be done by changing the appropriate Nix declarations
 and redeploying with nixops. State inconsistencies will lead to problems! You
 have been warned.
 
+## TMP AWS Console
+
+Log in at https://857172137115.signin.aws.amazon.com/console
+
 ## Nix and Nixops
 
 From the Nix homepage:
@@ -88,3 +92,60 @@ for you.
 Still, there are situations where you will want to do things manually. In this
 case, you will want to copy `deployments.nixops` from the CI runner, and specify
 the path as `nixops -s /path/to/deployments.nixops <all other args/commands>`.
+
+This is simplified by the script in `scripts/no` which will mount the remote
+folder and point nixops at the state file in it. Just use it as a nixops
+replacement, for example `scripts/no deploy -d dscp-production --include
+builder`.
+
+Bear in mind that you need the following in your `~/.ssh/config`:
+
+```
+Host tmp.builder
+  hostname ec2-13-231-105-137.ap-northeast-1.compute.amazonaws.com
+```
+
+And also that rebooting the builder node will close the sshfs connection,
+making the nixops statefile evaporate mid-run. This is bad, as you might have
+guessed. If you need to reboot the builder, for example to change instance
+types, copy the statefile onto your computer first, then copy it back when the
+builder is back up.
+
+## Deploying the builder
+
+There are three bits of state that nixops can not replicate from scratch easily.
+One is the nixops state file itself, which needs to exist on the builder so
+that CI can run nixops for us. This needs to live in
+`/var/lib/buildkite-agent/.nixops/deployments.nixops`.
+
+The second is a symlink from `/var/lib/buildkite-agent/.aws/credentials` to
+`/run/keys/aws-credentials`. Nixops seems to have forgotten how to use the
+`deployment.keys.foo.path` option, so manually symlinking it will have to do.
+
+The third is a GnuPG keyring that includes the private key in
+`keys/buildkite-gpg-private.key`, which is needed in order to unlock the crypt
+vault.
+
+### Creating a keyring
+
+```sh
+# First, make sure the vault is unlocked
+$ git crypt unlock
+
+# Create a temporary gnupg home dir so we get an empty keyring on import
+$ export GNUPGHOME=$(mktemp -d) ; echo $GNUPGHOME
+$ gnupg --import keys/buildkite-gpg-private.key
+
+# Mount the server folder and transfer the keyring
+$ mkdir builder-remote
+$ nixops mount -d dscp-stg builder:/var/lib/buildkite-agent builder-remote
+$ cp -r $GNUPGHOME builder-remote/.gnupg
+
+# SSH into the builder to fix the permissions and ownership
+$ nixops ssh -d dscp-stg builder
+
+# And now on the builder
+$ cd /var/lib/buildkite-agent
+$ chown -R buildkite-agent:nogroup .gnupg
+$ chmod -R go-rwx .gnupg
+```
