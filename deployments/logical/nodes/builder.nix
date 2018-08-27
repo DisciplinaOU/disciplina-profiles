@@ -49,6 +49,7 @@ let keys = config.dscp.keys; in
   users.users.nixops = {
     isSystemUser = true;
     group = "nixops";
+    extraGroups = [ "keys" ];
     home = "/var/lib/nixops";
     createHome = true;
   };
@@ -72,9 +73,9 @@ let keys = config.dscp.keys; in
     deps = [];
     text = ''
       mkdir -p /var/lib/nixops/.aws
-      chown -R nixops:nixops /var/lib/nixops/.aws
       chmod -R go-rwx /var/lib/nixops/.aws
       ln -sf /run/keys/aws-credentials /var/lib/nixops/.aws/credentials
+      chown -R nixops:nixops /var/lib/nixops/.aws
     '';
   };
 
