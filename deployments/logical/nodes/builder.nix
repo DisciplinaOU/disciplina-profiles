@@ -27,17 +27,54 @@ let keys = config.dscp.keys; in
   # };
 
   # Make sure admins can read/write the nixops state file to allow wrapper script access
+  # users.extraUsers.buildkite-agent.extraGroups = [ "nixops" ];
+  # system.activationScripts.nixops = {
+  #   deps = [];
+  #   text = ''
+  #     chgrp nixops /var/lib/buildkite-agent
+  #     chmod g+rwx /var/lib/buildkite-agent
+
+  #     chgrp -R nixops /var/lib/buildkite-agent/.nixops
+  #     chmod -R g+rw /var/lib/buildkite-agent/.nixops
+  #     chmod g+rwx /var/lib/buildkite-agent/.nixops
+  #   '';
+  # };
+
+
+  environment.systemPackages = with pkgs; [
+    nixops-git
+  ];
+
   users.extraGroups.nixops = {};
-  users.extraUsers.buildkite-agent.extraGroups = [ "nixops" ];
-  system.activationScripts.nixops = {
+  users.users.nixops = {
+    isSystemUser = true;
+    group = "nixops";
+    home = "/var/lib/nixops";
+    createHome = true;
+  };
+
+  security.sudo.extraRules = [
+    {
+      ##
+      # Allow members of the `wheel` group, as well as user `buildkite-agent`
+      # to execute `nixops deploy` as the `nixops` user.
+      commands = [
+        { command = "${pkgs.nixops-git}/bin/nixops deploy *";
+          options = [ "SETENV" "NOPASSWD" ]; }
+      ];
+      groups = [ "wheel" ];
+      users = [ "buildkite-agent" ];
+      runAs = "nixops";
+    }
+  ];
+
+  system.activationScripts.aws-credentials = {
     deps = [];
     text = ''
-      chgrp nixops /var/lib/buildkite-agent
-      chmod g+rwx /var/lib/buildkite-agent
-
-      chgrp -R nixops /var/lib/buildkite-agent/.nixops
-      chmod -R g+rw /var/lib/buildkite-agent/.nixops
-      chmod g+rwx /var/lib/buildkite-agent/.nixops
+      mkdir -p /var/lib/nixops/.aws
+      chown -R nixops:nixops /var/lib/nixops/.aws
+      chmod -R go-rwx /var/lib/nixops/.aws
+      ln -sf /run/keys/aws-credentials /var/lib/nixops/.aws/credentials
     '';
   };
 
@@ -45,6 +82,6 @@ let keys = config.dscp.keys; in
     # buildkite-token =       { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
     # buildkite-ssh-private = { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
     # buildkite-ssh-public =  { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
-    aws-credentials =   rec { services = [ "buildkite-agent" ]; user = "buildkite-agent"; shared = false; } ;
+    aws-credentials = { user = "nixops"; shared = false; };
   };
 }
