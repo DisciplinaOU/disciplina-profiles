@@ -62,7 +62,7 @@ let keys = config.dscp.keys; in
         { command = "${pkgs.nixops-git}/bin/nixops deploy *";
           options = [ "SETENV" "NOPASSWD" ]; }
       ];
-      groups = [ "wheel" ];
+      groups = [ "wheel" "nixops" ];
       users = [ "buildkite-agent" ];
       runAs = "nixops";
     }
