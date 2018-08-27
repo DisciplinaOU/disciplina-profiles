@@ -4,9 +4,9 @@ let
     options = with lib; with types; {
       config-file = mkOption { type = string; };
       config-key = mkOption { type = string; };
-      bind-port1 = mkOption { type = int; };
-      bind-port2 = mkOption { type = int; };
-      public-ip = mkOption { type = string;};
+      bind-port1 = mkOption { type = int; default = 4010; };
+      bind-port2 = mkOption { type = int; default = 4011; };
+      public-ip = mkOption { type = string; };
       bind-host = mkOption { type = nullOr string; default = "*"; };
       debug = mkEnableOption "debug";
       extraArgs = mkOption { type = listOf string; default = []; };
@@ -91,7 +91,7 @@ in
       script = "dscp-${type} ${lib.concatStringsSep " " (args ++ extraArgs)}";
       after = [ "network.target" ];
       requires = [ "network.target" ];
-      path = [ package ];
+      path = [ package pkgs.curl ];
       serviceConfig = {
         StateDirectory = "disciplina";
         LogsDirectory = "disciplina";

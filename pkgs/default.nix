@@ -12,5 +12,6 @@ rec {
     inherit (final.python2Packages) libvirt;
   };
 
-  disciplina = (import (fetchGit { url = "ssh://git@github.com:/DisciplinaOU/disciplina"; ref = "release-alpha"; })).disciplina-bin;
+  # disciplina = (import (fetchGit { url = "ssh://git@github.com:/DisciplinaOU/disciplina"; ref = "release-alpha"; })).disciplina-bin;
+  disciplina = (import <disciplina>).disciplina-bin;
 }
