@@ -2,6 +2,22 @@
   # todo: move this to cd profile
   disciplina."witness" = {
     config-file = "${pkgs.writeText "config.yaml" ''
+demo: &demo
+  core: &demo-core
+    slotDuration: 10000 # 10 s
+    genesis: &demo-genesis
+      genesisSeed: "GromakNaRechke"
+      governance:
+        type: committeeOpen
+        secret: "opencommittee"
+        n: 4
+      distribution:
+        - equal: 1000
+        - specific:
+          - # faucet
+            - "LL4qKn62hrdLh1vkyiidEFLfCaAngaVmtu3ipGVSubhackXS4pXNbeDC"
+            - 100
+
 alpha:
   <<: *demo
   core:
