@@ -4,6 +4,10 @@ let keys = config.dscp.keys; in
   # stack2nix <3
   nix.useSandbox = false;
 
+  # Default = slow
+  nix.maxJobs = 4;
+  nix.buildCores = 0;
+
   # To copy closures around
   nix.trustedUsers = [ "chris" ];
 
