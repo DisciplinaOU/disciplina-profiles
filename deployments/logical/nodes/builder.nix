@@ -95,6 +95,23 @@ let keys = config.dscp.keys; in
     '';
   };
 
+  services.nginx = {
+    enable = true;
+    upstreams.witness = {
+      servers = {
+        "http://witness1:4030" = { };
+        "http://witness2:4030" = { };
+        "http://witness3:4030" = { };
+      };
+    };
+    virtualHosts = {
+      witness = {
+        default = true;
+        locations."/".proxyPass = "http://witness";
+      };
+    };
+  };
+
   dscp.keys = {
     # buildkite-token =       { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
     # buildkite-ssh-private = { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };

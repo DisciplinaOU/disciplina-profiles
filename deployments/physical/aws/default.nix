@@ -22,10 +22,10 @@
     ];
     dscp = { inherit keydir; };
 
-    deployment.route53 = lib.mkIf (domain != null) {
+    deployment.route53 = lib.mkIf (realDomain != null) {
       inherit accessKeyId;
       usePublicDNSName = lib.mkDefault false;
-      hostName =  "${config.networking.hostName}.${domain}";
+      hostName =  "${config.networking.hostName}.${realDomain}";
     };
 
     deployment.targetEnv = "ec2";
@@ -45,5 +45,5 @@
   witness1 = import ./nodes/witness.nix { };
   witness2 = import ./nodes/witness.nix { };
   witness3 = import ./nodes/witness.nix { };
-  builder = import ./nodes/builder.nix;
+  builder = import ./nodes/builder.nix { inherit domain; };
 }

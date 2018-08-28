@@ -100,7 +100,7 @@ in
       script = "dscp-${type} ${lib.concatStringsSep " " (args ++ extraArgs)}";
       after = [ "network.target" ];
       requires = [ "network.target" ];
-      path = [ package pkgs.curl ];
+      path = with pkgs; [ package curl getent gawk ];
       serviceConfig = {
         StateDirectory = "disciplina";
         LogsDirectory = "disciplina";

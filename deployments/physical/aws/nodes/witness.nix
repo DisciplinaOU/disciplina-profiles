@@ -8,8 +8,14 @@
     usePrivateIpAddress = true;
     securityGroupIds = [ resources.ec2SecurityGroups.dscp-ssh-private-sg.name ]
       ++ (if internal then
-      [ resources.ec2SecurityGroups.dscp-witness-private-sg.name ]
+      [
+        resources.ec2SecurityGroups.dscp-witness-private-sg.name
+        resources.ec2SecurityGroups.dscp-witness-api-private-sg.name
+      ]
       else
-      [ resources.ec2SecurityGroups.dscp-witness-public-sg.name ]);
+      [
+        resources.ec2SecurityGroups.dscp-witness-public-sg.name
+        resources.ec2SecurityGroups.dscp-witness-api-public-sg.name
+      ]);
   };
 }

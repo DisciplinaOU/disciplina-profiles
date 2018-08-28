@@ -59,6 +59,7 @@ rec {
     rules = [
       # Disciplina witness
       { fromPort =  4010; toPort =  4010; sourceIp = "0.0.0.0/0"; }
+      { fromPort =  4011; toPort =  4011; sourceIp = "0.0.0.0/0"; }
     ];
   };
 
@@ -70,6 +71,29 @@ rec {
     rules = [
       # Disciplina witness
       { fromPort =  4010; toPort =  4010; sourceIp = vpc.dscp-vpc.cidrBlock; }
+      { fromPort =  4011; toPort =  4011; sourceIp = vpc.dscp-vpc.cidrBlock; }
+    ];
+  };
+
+  ec2SecurityGroups.dscp-witness-api-public-sg =
+  { resources, lib, ... }:
+  {
+    inherit region accessKeyId;
+    vpcId = resources.vpc.dscp-vpc;
+    rules = [
+      # Disciplina witness
+      { fromPort =  4030; toPort =  4030; sourceIp = "0.0.0.0/0"; }
+    ];
+  };
+
+  ec2SecurityGroups.dscp-witness-api-private-sg =
+  { resources, lib, ... }:
+  {
+    inherit region accessKeyId;
+    vpcId = resources.vpc.dscp-vpc;
+    rules = [
+      # Disciplina witness
+      { fromPort =  4030; toPort =  4030; sourceIp = vpc.dscp-vpc.cidrBlock; }
     ];
   };
 
