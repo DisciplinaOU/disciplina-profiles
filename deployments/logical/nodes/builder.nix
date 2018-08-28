@@ -54,8 +54,9 @@ let keys = config.dscp.keys; in
     createHome = true;
   };
 
-  security.sudo.extraRules = [
-    {
+  security.sudo = {
+    extraRules = [
+      {
       ##
       # Allow members of the `wheel` group, as well as user `buildkite-agent`
       # to execute `nixops deploy` as the `nixops` user.
@@ -72,9 +73,12 @@ let keys = config.dscp.keys; in
       groups = [ "wheel" "nixops" ];
       users = [ "buildkite-agent" ];
       runAs = "nixops";
-    }
-  ];
-
+      }
+    ];
+    extraConfig = ''
+      Defaults env_keep += "nix_path"
+    '';
+  };
   system.activationScripts.aws-credentials = {
     deps = [];
     text = ''
