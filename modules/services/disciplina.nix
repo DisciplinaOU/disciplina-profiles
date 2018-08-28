@@ -38,6 +38,7 @@ let
         listen = mkOption { type = nullOr string; default = "0.0.0.0:4030"; example = "127.0.0.1:4030"; };
         genKey = mkOption { type = bool; default = true; };
         comm-n = mkOption { type = nullOr int; default = null; example = 1; };
+        comm-sec = mkOption { type = nullOr string; default = null; example = "MAV5Q5xJNB5z3zkLMK8S"; };
       };
     };
   };
@@ -63,6 +64,7 @@ in
         ++ (lib.optional (!isNull witness.listen) "--witness-listen ${witness.listen}")
         ++ (lib.optional witness.genKey "--witness-gen-key")
         ++ (lib.optional (!isNull witness.comm-n) "--comm-n ${toString witness.comm-n}")
+        ++ (lib.optional (!isNull witness.comm-sec) "--comm-sec ${toString witness.comm-n}")
         else [])
       ++ (if (type == "educator") then ([
         "--educator-keyfile ${state}/educator.key"

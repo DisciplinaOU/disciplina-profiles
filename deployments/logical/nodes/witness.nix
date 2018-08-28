@@ -1,4 +1,6 @@
-{ n }: { pkgs, lib, config, nodes, ... }: {
+{ n }: { pkgs, lib, config, nodes, ... }:
+let keys = config.dscp.keys; in
+{
   # todo: move this to cd profile
   disciplina."witness" = {
     config-file = "${pkgs.writeText "config.yaml" ''
@@ -46,6 +48,7 @@ alpha:
     type = "witness";
     witness = {
       comm-n = n;
+      comm-sec = toString keys.committee-secret;
     };
     # peers = [
     #   "witness0:4010:4011"
@@ -57,13 +60,20 @@ alpha:
     ["$(getent hosts ${nodes."${nodename}".config.networking.hostName} | awk '{print $1;exit}'):4010:4011"])
     (lib.attrNames nodes);
   };
+
   networking.firewall.allowedTCPPorts = [ 4030 80 ];
+
   services.openssh.ports = lib.mkForce [ 22 ];
+
   services.nginx = {
     enable = true;
     virtualHosts.witness = {
       serverName = config.networking.hostName;
       locations."/".proxyPass = "http://localhost:4030";
     };
+  };
+
+  dscp.keys = {
+    committee-secret = { services = [ "disciplina-witness" ]; user = "disciplina"; };
   };
 }
