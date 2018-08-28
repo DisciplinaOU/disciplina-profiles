@@ -53,7 +53,9 @@ let keys = config.dscp.keys; in
   users.users.nixops = {
     isSystemUser = true;
     group = "nixops";
-    extraGroups = [ "keys" ];
+    # keys: read nixops ephemeral keys
+    # users: read nix files from user homes
+    extraGroups = [ "keys" "users" ];
     home = "/var/lib/nixops";
     createHome = true;
   };
