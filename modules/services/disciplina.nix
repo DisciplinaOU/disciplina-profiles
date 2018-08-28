@@ -47,7 +47,7 @@ in
     type = with types; attrsOf (submodule disciplina-options);
     default = {};
   };
-  config.users.users = lib.mkIf (config.disciplina != {}) { disciplina = {}; };
+  config.users.users = lib.mkIf (config.disciplina != {}) { disciplina = { home = "/var/lib/disciplina"; createHome = true; isSystemUser = true; }; };
   config.systemd.services = lib.mkMerge (lib.mapAttrsToList (name: cfg:
   let
     args = with cfg; let state = "/var/lib/disciplina/${name}"; in
