@@ -4,6 +4,6 @@ import ./. rec {
   # domain = "disciplina.io";
   # realDomain = "disciplina.io";
   keydir = "production";
-  region = "ap-northeast-1"; # Tokyo
+  region = "eu-central-1"; # Frankfurt
   zone = "${region}a";
 }
