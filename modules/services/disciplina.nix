@@ -35,7 +35,7 @@ let
         type = enum [ "educator" "witness" "faucet" ];
       };
       witness = {
-        listen = mkOption { type = nullOr string; default = null; example = "127.0.0.1:4020"; };
+        listen = mkOption { type = nullOr string; default = "0.0.0.0:4030"; example = "127.0.0.1:4030"; };
         genKey = mkOption { type = bool; default = true; };
         comm-n = mkOption { type = nullOr int; default = null; example = 1; };
       };

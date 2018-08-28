@@ -25,11 +25,10 @@ alpha:
             - 20000000
     ''}";
     config-key = "alpha";
-    public-ip = "$(curl http://169.254.169.254/latest/meta-data/public-ipv4)";
+    public-ip = "$(curl http://169.254.169.254/latest/meta-data/public-ipv4 2>/dev/null)";
     openFirewall = true;
     type = "witness";
     witness = {
-      listen = "0.0.0.0:4030";
       comm-n = n;
     };
     # peers = [
