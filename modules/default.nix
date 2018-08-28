@@ -2,7 +2,7 @@
 
 let
   wheel = [ "chris" "kirelagin" "yegortimoshenko" "yorick" ];
-  ops = [ "flyingleafe" ];
+  ops = wheel ++ [ "flyingleafe" ];
   expandUser = _name: keys: {
     extraGroups = (lib.optional (builtins.elem _name wheel) "wheel") ++ (lib.optional (builtins.elem _name ops) "nixops") ++ [ "systemd-journal" ];
     isNormalUser = true;

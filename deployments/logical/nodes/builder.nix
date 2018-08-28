@@ -80,7 +80,7 @@ let keys = config.dscp.keys; in
       }
     ];
     extraConfig = ''
-      Defaults env_keep += "nix_path"
+      Defaults env_keep+=NIX_PATH
     '';
   };
   system.activationScripts.aws-credentials = {
