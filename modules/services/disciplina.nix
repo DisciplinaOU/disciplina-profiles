@@ -48,7 +48,14 @@ in
     type = with types; attrsOf (submodule disciplina-options);
     default = {};
   };
-  config.users.users = lib.mkIf (config.disciplina != {}) { disciplina = { home = "/var/lib/disciplina"; createHome = true; isSystemUser = true; }; };
+  config.users.users = lib.mkIf (config.disciplina != {}) {
+    disciplina = {
+      home = "/var/lib/disciplina";
+      createHome = true;
+      isSystemUser = true;
+      extraGroups = [ "keys" ];
+    };
+  };
   config.systemd.services = lib.mkMerge (lib.mapAttrsToList (name: cfg:
   let
     args = with cfg; let state = "/var/lib/disciplina/${name}"; in
@@ -64,7 +71,7 @@ in
         ++ (lib.optional (!isNull witness.listen) "--witness-listen ${witness.listen}")
         ++ (lib.optional witness.genKey "--witness-gen-key")
         ++ (lib.optional (!isNull witness.comm-n) "--comm-n ${toString witness.comm-n}")
-        ++ (lib.optional (!isNull witness.comm-sec) "--comm-sec ${toString witness.comm-n}")
+        ++ (lib.optional (!isNull witness.comm-sec) "--comm-sec ${toString witness.comm-sec}")
         else [])
       ++ (if (type == "educator") then ([
         "--educator-keyfile ${state}/educator.key"

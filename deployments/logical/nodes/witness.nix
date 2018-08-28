@@ -48,17 +48,10 @@ alpha:
     type = "witness";
     witness = {
       comm-n = n;
-      comm-sec = toString keys.committee-secret;
+      comm-sec = "$(cat ${toString keys.committee-secret})";
     };
-    # peers = [
-    #   "witness0:4010:4011"
-    #   "witness1:4010:4011"
-    #   "witness2:4010:4011"
-    #   "witness3:4010:4011"
-    # ];
-    peers = lib.concatMap (nodename: if (nodename == "witness${toString n}" || !(lib.hasPrefix nodename "witness")) then [] else
-    ["$(getent hosts ${nodes."${nodename}".config.networking.hostName} | awk '{print $1;exit}'):4010:4011"])
-    (lib.attrNames nodes);
+    peers = lib.concatMap (nodename: if (nodename == "witness${toString n}" || !(lib.hasPrefix "witness" nodename)) then [] else
+              ["$(getent hosts ${nodename} | awk '{print $1}'):4010:4011"]) (lib.attrNames nodes);
   };
 
   networking.firewall.allowedTCPPorts = [ 4030 80 ];
