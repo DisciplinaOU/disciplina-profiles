@@ -6,7 +6,10 @@
     ebsInitialRootDiskSize = 30;
     # Witness nodes don't allow SSH on public interface
     usePrivateIpAddress = true;
-    securityGroupIds = [ resources.ec2SecurityGroups.dscp-ssh-private-sg.name ]
+    securityGroupIds = [
+      resources.ec2SecurityGroups.dscp-ssh-private-sg.name
+      resources.ec2SecurityGroups.dscp-default-sg.name
+      ]
       ++ (if internal then
       [
         resources.ec2SecurityGroups.dscp-witness-private-sg.name

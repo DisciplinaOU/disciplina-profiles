@@ -35,7 +35,7 @@ rec {
     inherit region accessKeyId;
     vpcId = resources.vpc.dscp-vpc;
     rules = [
-      # Prometheus node exporter
+      # HTTP(S)
       { fromPort =  80; toPort =  80; sourceIp = "0.0.0.0/0"; }
       { fromPort = 443; toPort = 443; sourceIp = "0.0.0.0/0"; }
     ];
@@ -81,7 +81,7 @@ rec {
     inherit region accessKeyId;
     vpcId = resources.vpc.dscp-vpc;
     rules = [
-      # Disciplina witness
+      # Disciplina witness ZMQ
       { fromPort =  4010; toPort =  4010; sourceIp = vpc.dscp-vpc.cidrBlock; }
       { fromPort =  4011; toPort =  4011; sourceIp = vpc.dscp-vpc.cidrBlock; }
     ];
@@ -93,7 +93,7 @@ rec {
     inherit region accessKeyId;
     vpcId = resources.vpc.dscp-vpc;
     rules = [
-      # Disciplina witness
+      # Disciplina witness HTTP API
       { fromPort =  4030; toPort =  4030; sourceIp = "0.0.0.0/0"; }
     ];
   };
@@ -104,8 +104,19 @@ rec {
     inherit region accessKeyId;
     vpcId = resources.vpc.dscp-vpc;
     rules = [
-      # Disciplina witness
+      # Disciplina witness HTTP API
       { fromPort =  4030; toPort =  4030; sourceIp = vpc.dscp-vpc.cidrBlock; }
+    ];
+  };
+
+  ec2SecurityGroups.dscp-telegraf-private-sg =
+  { resources, lib, ... }:
+  {
+    inherit region accessKeyId;
+    vpcId = resources.vpc.dscp-vpc;
+    rules = [
+      # Telegraf ingress port
+      { fromPort =  8125; toPort =  8125; sourceIp = vpc.dscp-vpc.cidrBlock; }
     ];
   };
 

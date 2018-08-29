@@ -62,8 +62,10 @@ in
     args = with cfg; let state = "/var/lib/disciplina/${name}"; in
     [ "--config ${config-file}"
       "--config-key ${config-key}"
-      "--log-dir /var/log/disciplina/${name}" ]
+      "--log-dir /var/log/disciplina/${name}"
+      ]
       ++ (if (type == "witness" || type == "educator") then [
+        "--metrics-server $(getent hosts builder | awk '{print $1}'):8125"
         "--db-path ${state}/witness.db"
         "--bind ${public-ip}:${toString bind-port1}:${toString bind-port2}"
         "--bind-internal '${bind-host}:${toString bind-port1}:${toString bind-port2}'"

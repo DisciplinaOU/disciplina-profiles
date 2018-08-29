@@ -32,6 +32,7 @@ in
   imports = [
     ../keys
     ./services/disciplina.nix
+    ./services/prometheus.nix
   ];
 
   environment.systemPackages = with pkgs; [
@@ -118,19 +119,14 @@ in
   };
   services.nixosManual.enable = false;
 
-  # # Enable Prometheus exporting on all nodes
-  # services.prometheus.exporters.node = {
-  #   enable = true;
-  #   openFirewall = true;
-  #   enabledCollectors = [ "systemd" "logind" ];
-  #   extraFlags = ["--collector.textfile.directory /etc/node-exporter"];
-  # };
-
-  # environment.etc."node-exporter/server_info.prom".text = ''
-  #   # HELP nix_desc NixOps deployment info
-  #   # TYPE nix_desc gauge
-  #   nix_desc{deploymentName="${deploymentName}", nodename="${name}", deployer="${builtins.getEnv "USER"}", desc="${gitinfo.description}", rev="${gitinfo.revision}"} 1
-  # '';
+  services.prometheus.exporters = {
+    node = {
+      enable = true;
+      openFirewall = true;
+      enabledCollectors = [ "systemd" ];
+      disabledCollectors = [ "timex" ];
+    };
+  };
 
   services.openssh = {
     enable = true;
