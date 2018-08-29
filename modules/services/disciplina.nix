@@ -11,7 +11,7 @@ let
       debug = mkEnableOption "debug";
       extraArgs = mkOption { type = listOf string; default = []; };
       openFirewall = mkEnableOption "firewall port opening";
-      package = mkOption { type = package; default = pkgs.disciplina; };
+      package = mkOption { type = package; default = pkgs.disciplina-bin; };
       peers = mkOption {
         type = listOf string; default = [];
       };
