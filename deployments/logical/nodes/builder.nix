@@ -36,7 +36,7 @@ let
           description: "Unit {{ $labels.name }} on instance {{ $labels.instance }} has been down for more than 5 minutes."
 
       - alert: FSFilling
-        expr: (node_filesystem_size - node_filesystem_avail) / node_filesystem_size > 80
+        expr: (node_filesystem_size_bytes - node_filesystem_avail_bytes) / node_filesystem_size_bytes > 0.8
         for: 12h
         labels:
           severity: slack
@@ -154,8 +154,18 @@ in
   };
 
   networking.firewall.allowedTCPPorts = [ 80 443 ];
+
+  systemd.services.nginx.unitConfig = {
+    LimitNOFILE = 500000;
+    LimitNPROC = 500000;
+  };
+
   services.nginx = {
     enable = true;
+    appendConfig = ''
+      worker_processes auto;
+    '';
+    eventsConfig = "worker_connections 1024;";
     upstreams.witness = {
       servers = {
         "witness1:4030" = { };
@@ -279,34 +289,36 @@ in
       inputs.statsd = {
         service_address = ":${toString ports.statsd}";
         parse_data_dog_tags = true;
+        # metric_separator = "_";
+        # protocol = "udp4";
       };
 
       outputs.prometheus_client = {
         listen = ":${toString ports.telegraf}";
         ## Interval to expire metrics and not deliver to prometheus, 0 == no expiration
-        expiration_interval = "10s";
+        expiration_interval = "60s";
       };
     };
   };
 
-  # services.grafana = {
-  #   #enable = true;
-  #   port = ports.grafana;
-  #   addr = "0.0.0.0";
-  #   # rootUrl = with config.services.nginx.virtualHosts.grafana;
-  #   #   "http${lib.optionalString (enableSSL || onlySSL || addSSL || forceSSL) "s"}://${serverName}/";
-  #   rootUrl = "https://grafana.net.disciplina.io";
-  #   extraOptions = {
-  #     AUTH_GOOGLE_ENABLED = "true";
-  #     AUTH_GOOGLE_ALLOWED_DOMAINS = "serokell.io";
-  #     AUTH_GOOGLE_ALLOW_SIGN_UP = "true";
-  #   };
-  # };
+  services.grafana = {
+    #enable = true;
+    port = ports.grafana;
+    addr = "0.0.0.0";
+    # rootUrl = with config.services.nginx.virtualHosts.grafana;
+    #   "http${lib.optionalString (enableSSL || onlySSL || addSSL || forceSSL) "s"}://${serverName}/";
+    rootUrl = "https://grafana.net.disciplina.io";
+    # extraOptions = {
+    #   AUTH_GOOGLE_ENABLED = "true";
+    #   AUTH_GOOGLE_ALLOWED_DOMAINS = "serokell.io";
+    #   AUTH_GOOGLE_ALLOW_SIGN_UP = "true";
+    # };
+  };
 
   # systemd.services.grafana.serviceConfig = {
   #   PermissionsStartOnly = true;
   #   # EnvironmentFile = "/root/grafana.env";
-  #   EnvironmentFile = keys.grafana-env;
+  #   # EnvironmentFile = keys.grafana-env;
   # };
 
   dscp.keys = {

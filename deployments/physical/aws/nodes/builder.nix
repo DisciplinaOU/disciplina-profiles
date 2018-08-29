@@ -2,7 +2,7 @@
 
 {
   deployment.ec2 = {
-    instanceType = "t2.xlarge";
+    instanceType = "c5.xlarge";
     ebsInitialRootDiskSize = 300;
     securityGroupIds = [
       resources.ec2SecurityGroups.dscp-default-sg.name

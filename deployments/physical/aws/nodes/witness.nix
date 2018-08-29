@@ -2,7 +2,7 @@
 
 {
   deployment.ec2 = {
-    instanceType = "t2.small";
+    instanceType = "c5.xlarge";
     ebsInitialRootDiskSize = 30;
     # Witness nodes don't allow SSH on public interface
     usePrivateIpAddress = true;
