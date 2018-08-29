@@ -2,7 +2,7 @@
 let keys = config.dscp.keys; in
 {
   # todo: move this to cd profile
-  disciplina."witness" = {
+  disciplina.witness = {
     config-file = "${pkgs.writeText "config.yaml" ''
 demo: &demo
   core: &demo-core
@@ -43,15 +43,15 @@ alpha:
             - 20000000
     ''}";
     config-key = "alpha";
-    public-ip = "$(curl http://169.254.169.254/latest/meta-data/public-ipv4 2>/dev/null)";
+    public-ip = "$(curl http://169.254.169.254/latest/meta-data/local-ipv4 2>/dev/null)";
     openFirewall = true;
     type = "witness";
     witness = {
       comm-n = n;
       comm-sec = "$(cat ${toString keys.committee-secret})";
     };
-    peers = lib.concatMap (nodename: if (nodename == "witness${toString n}" || !(lib.hasPrefix "witness" nodename)) then [] else
-              ["$(getent hosts ${nodename} | awk '{print $1}'):4010:4011"]) (lib.attrNames nodes);
+    peers = lib.concatMap (nodename: if (nodename == "witness${toString n}" || !(lib.hasPrefix "witness" nodename)) then []
+              else ["$(getent hosts ${nodename} | awk '{print $1}'):4010:4011"]) (lib.attrNames nodes);
   };
 
   networking.firewall.allowedTCPPorts = [ 4030 ];
