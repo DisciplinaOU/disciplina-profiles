@@ -16,6 +16,7 @@
   services.nginx.virtualHosts = {
     witness.serverName = "witness.${domain}";
     faucet.serverName = "faucet.${domain}";
+    explorer.serverName = "explorer.${domain}";
     grafana.serverName = "grafana.net.${domain}";
     prometheus.serverName = "prometheus.net.${domain}";
     alertManager.serverName = "alertmanager.net.${domain}";

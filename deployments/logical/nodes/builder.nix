@@ -154,6 +154,7 @@ in
   };
 
   networking.firewall.allowedTCPPorts = [ 80 443 ];
+  networking.firewall.allowedUDPPorts = [ ports.statsd ];
 
   systemd.services.nginx.unitConfig = {
     LimitNOFILE = 500000;
@@ -182,7 +183,7 @@ in
 
     virtualHosts = {
       witness = {
-        # default = true;
+        default = true;
         locations."/".proxyPass = "http://witness";
       };
 
@@ -195,11 +196,9 @@ in
         };
       };
 
+      explorer.locations."/".root = "${pkgs.disciplina-witness-frontend}";
       grafana.locations."/".proxyPass = "http://grafana";
-      prometheus = {
-        default = true;
-        locations."/".proxyPass = "http://prometheus";
-      };
+      prometheus.locations."/".proxyPass = "http://prometheus";
       alertManager.locations."/".proxyPass = "http://alertManager";
     };
   };
@@ -289,7 +288,7 @@ in
       inputs.statsd = {
         service_address = ":${toString ports.statsd}";
         parse_data_dog_tags = true;
-        # metric_separator = "_";
+        metric_separator = ".";
         # protocol = "udp4";
       };
 
@@ -302,11 +301,9 @@ in
   };
 
   services.grafana = {
-    #enable = true;
+    enable = true;
     port = ports.grafana;
     addr = "0.0.0.0";
-    # rootUrl = with config.services.nginx.virtualHosts.grafana;
-    #   "http${lib.optionalString (enableSSL || onlySSL || addSSL || forceSSL) "s"}://${serverName}/";
     rootUrl = "https://grafana.net.disciplina.io";
     # extraOptions = {
     #   AUTH_GOOGLE_ENABLED = "true";

@@ -98,8 +98,7 @@ rec {
     vpcId = resources.vpc.dscp-vpc;
     rules = [
       # Disciplina witness
-      { fromPort =  4010; toPort =  4010; sourceIp = "0.0.0.0/0"; }
-      { fromPort =  4011; toPort =  4011; sourceIp = "0.0.0.0/0"; }
+      { fromPort =  4010; toPort =  4011; sourceIp = "0.0.0.0/0"; }
     ];
   };
 
@@ -110,8 +109,7 @@ rec {
     vpcId = resources.vpc.dscp-vpc;
     rules = [
       # Disciplina witness ZMQ
-      { fromPort =  4010; toPort =  4010; sourceIp = vpc.dscp-vpc.cidrBlock; }
-      { fromPort =  4011; toPort =  4011; sourceIp = vpc.dscp-vpc.cidrBlock; }
+      { fromPort =  4010; toPort =  4011; sourceIp = vpc.dscp-vpc.cidrBlock; }
     ];
   };
 
@@ -144,7 +142,7 @@ rec {
     vpcId = resources.vpc.dscp-vpc;
     rules = [
       # Telegraf ingress port
-      { fromPort =  8125; toPort =  8125; sourceIp = vpc.dscp-vpc.cidrBlock; }
+      { fromPort =  8125; toPort =  8125; protocol = "udp"; sourceIp = vpc.dscp-vpc.cidrBlock; }
     ];
   };
 

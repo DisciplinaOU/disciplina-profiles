@@ -16,4 +16,5 @@ rec {
   disciplina = (import <disciplina>);
   disciplina-bin = disciplina.disciplina-bin;
   disciplina-faucet-frontend = disciplina.disciplina-faucet-frontend;
+  disciplina-witness-frontend = disciplina.disciplina-witness-frontend;
 }
