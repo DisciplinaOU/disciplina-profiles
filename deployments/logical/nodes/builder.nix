@@ -95,6 +95,19 @@ let keys = config.dscp.keys; in
     '';
   };
 
+  disciplina.faucet = {
+    type = "faucet";
+    config-file = "${pkgs.disciplina-bin}/etc/disciplina/configuration.yaml";
+    config-key = "clusterCi";
+    faucet = {
+      listen = "127.0.0.1:4014";
+      translatedAmount = 20;
+      witnessBackend = "witness1:4030";
+      genKey = false;
+      keyFile = keys.faucet-keyfile;
+    };
+  };
+
   networking.firewall.allowedTCPPorts = [ 80 443 ];
   services.nginx = {
     enable = true;
@@ -106,10 +119,24 @@ let keys = config.dscp.keys; in
       };
       extraConfig = "ip_hash;";
     };
+    upstreams.faucet = {
+      servers = {
+        "localhost:4014" = {};
+      };
+    };
     virtualHosts = {
       witness = {
         default = true;
         locations."/".proxyPass = "http://witness";
+      };
+
+      faucet = {
+        locations = {
+          # "/api/faucet/v1/index.html".alias = "${pkgs.swagger-ui}.override { baseurl = "/api/faucet/v1/swagger.yaml"; }}/index.html";
+          "= /api/faucet/v1/".index = "index.html";
+          "/api".proxyPass = "http://faucet";
+          "/".root = "${pkgs.disciplina-faucet-frontend}";
+        };
       };
     };
   };
@@ -119,5 +146,6 @@ let keys = config.dscp.keys; in
     # buildkite-ssh-private = { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
     # buildkite-ssh-public =  { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
     aws-credentials = { user = "nixops"; shared = false; };
+    faucet-keyfile = { user = "disciplina"; services = [ "disciplina-faucet" ]; };
   };
 }

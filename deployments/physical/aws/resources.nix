@@ -29,6 +29,18 @@ rec {
     ];
   };
 
+  ec2SecurityGroups.dscp-http-public-sg =
+  { resources, lib, ... }:
+  {
+    inherit region accessKeyId;
+    vpcId = resources.vpc.dscp-vpc;
+    rules = [
+      # Prometheus node exporter
+      { fromPort =  80; toPort =  80; sourceIp = "0.0.0.0/0"; }
+      { fromPort = 443; toPort = 443; sourceIp = "0.0.0.0/0"; }
+    ];
+  };
+
   ec2SecurityGroups.dscp-ssh-private-sg =
   { resources, lib, ... }:
   {

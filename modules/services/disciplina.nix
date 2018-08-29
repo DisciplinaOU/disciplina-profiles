@@ -21,6 +21,7 @@ let
         translatedAmount = mkOption { type = int; example = 20; };
         witnessBackend = mkOption { type = string; example = "127.0.01:4020"; };
         dryRun = mkEnableOption "dry run (do not communicate to backend)";
+        keyFile = mkOption { type = nullOr path; default = null; };
       };
       educator = {
         bot = {
@@ -88,8 +89,7 @@ in
         "--translated-amount ${toString faucet.translatedAmount}"
         "--faucet-listen ${faucet.listen}"
         "--witness-backend ${faucet.witnessBackend}"
-        "--faucet-keyfile ${state}/faucet.key"
-      ]
+      ] ++ (lib.optional (!isNull faucet.keyFile) "--faucet-keyfile ${toString faucet.keyFile}")
         ++ (lib.optional faucet.genKey "--faucet-gen-key")
         ++ (lib.optional faucet.dryRun "--dry-run")
       else []);
