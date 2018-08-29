@@ -17,6 +17,22 @@ have been warned.
 
 Log in at https://857172137115.signin.aws.amazon.com/console
 
+## DNS Notes
+
+```
+builder.net.disciplina.io A 3.120.72.226
+witness1.net.disciplina.io A 18.196.224.137
+witness2.net.disciplina.io A 18.184.243.3
+witness3.net.disciplina.io A 3.120.61.181
+
+witness.disciplina.io CNAME builder.net.disciplina.io
+faucet.disciplina.io CNAME builder.net.disciplina.io
+explorer.disciplina.io CNAME builder.net.disciplina.io
+prometheus.net.disciplina.io CNAME builder.net.disciplina.io
+grafana.net.disciplina.io CNAME builder.net.disciplina.io
+alertmanager.net.disciplina.io CNAME builder.net.disciplina.io
+```
+
 ## Nix and Nixops
 
 From the Nix homepage:
