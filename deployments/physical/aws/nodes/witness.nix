@@ -1,9 +1,10 @@
-{ internal ? false }: { config, lib, resources, ... }:
+{ n, internal ? false }: { config, lib, resources, ... }:
 
 {
   deployment.ec2 = {
     instanceType = "c5.xlarge";
     ebsInitialRootDiskSize = 30;
+    elasticIPv4 = resources.elasticIPs."witness${n}-ip";
     # Witness nodes don't allow SSH on public interface
     usePrivateIpAddress = true;
     securityGroupIds = [

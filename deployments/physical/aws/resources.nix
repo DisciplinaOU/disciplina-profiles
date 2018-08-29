@@ -18,6 +18,34 @@ rec {
     mapPublicIpOnLaunch = true;
   };
 
+  elasticIPs.builder-ip =
+  { resources, lib, ... }:
+  {
+    inherit region accessKeyId;
+    vpc = true;
+  };
+
+  elasticIPs.witness1-ip =
+  { resources, lib, ... }:
+  {
+    inherit region accessKeyId;
+    vpc = true;
+  };
+
+  elasticIPs.witness2-ip =
+  { resources, lib, ... }:
+  {
+    inherit region accessKeyId;
+    vpc = true;
+  };
+
+  elasticIPs.witness3-ip =
+  { resources, lib, ... }:
+  {
+    inherit region accessKeyId;
+    vpc = true;
+  };
+
   ec2SecurityGroups.dscp-default-sg =
   { resources, lib, ... }:
   {
