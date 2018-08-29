@@ -2,7 +2,7 @@
 
 let
   wheel = [ "chris" "kirelagin" "yegortimoshenko" "yorick" ];
-  ops = wheel ++ [ "flyingleafe" ];
+  ops = wheel ++ [ "flyingleafe" "volhovm" ];
   expandUser = _name: keys: {
     extraGroups = (lib.optional (builtins.elem _name wheel) "wheel") ++ (lib.optional (builtins.elem _name ops) "nixops") ++ [ "systemd-journal" ];
     isNormalUser = true;
@@ -36,9 +36,13 @@ in
 
   environment.systemPackages = with pkgs; [
     binutils
+    curl
     dnsutils
+    gawk
     gdb
     git
+    git-crypt
+    gnused
     htop
     iptables
     ldns
