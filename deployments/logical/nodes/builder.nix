@@ -95,14 +95,16 @@ let keys = config.dscp.keys; in
     '';
   };
 
+  networking.firewall.allowedTCPPorts = [ 80 443 ];
   services.nginx = {
     enable = true;
     upstreams.witness = {
       servers = {
-        "http://witness1:4030" = { };
-        "http://witness2:4030" = { };
-        "http://witness3:4030" = { };
+        "witness1:4030" = { };
+        "witness2:4030" = { };
+        "witness3:4030" = { };
       };
+      extraConfig = "ip_hash;";
     };
     virtualHosts = {
       witness = {
