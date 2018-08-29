@@ -102,7 +102,7 @@ let keys = config.dscp.keys; in
     faucet = {
       listen = "127.0.0.1:4014";
       translatedAmount = 20;
-      witnessBackend = "witness1:4030";
+      witnessBackend = "http://witness1:4030";
       genKey = false;
       keyFile = keys.faucet-keyfile;
     };
