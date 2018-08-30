@@ -75,6 +75,25 @@ in
 
   security.sudo.wheelNeedsPassword = false;
 
+  security.sudo = {
+    extraRules = [
+      {
+      ##
+      # Allow members of the `nixops` group, as well as user `buildkite-agent`
+      commands = [
+        { command = "systemctl start disciplina-*";
+          options = [ "NOPASSWD" ]; }
+        { command = "systemctl stop disciplina-*";
+          options = [ "NOPASSWD" ]; }
+        { command = "systemctl restart disciplina-*";
+          options = [ "NOPASSWD" ]; }
+      ];
+      groups = [ "wheel" "nixops" ];
+      runAs = "root";
+      }
+    ];
+  };
+
   services.fail2ban = {
     enable = true;
     # Ban repeat offenders longer:
