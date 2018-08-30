@@ -170,6 +170,9 @@ in
     appendConfig = ''
       worker_processes auto;
     '';
+    commonHttpConfig = ''
+      access_log syslog:server=unix:/dev/log,tag=nginx,severity=info combined;
+    '';
     eventsConfig = "worker_connections 16384;";
     upstreams.witness = {
       servers = {
