@@ -73,17 +73,16 @@ in
   programs.zsh.enable = true;
   programs.mosh.enable = true;
 
-  security.sudo.wheelNeedsPassword = false;
-
   security.sudo = {
+    wheelNeedsPassword = false;
     extraRules = [
       {
       commands = [
-        { command = "systemctl start disciplina-*";
+        { command = "${pkgs.systemd}/bin/systemctl start disciplina-*";
           options = [ "NOPASSWD" ]; }
-        { command = "systemctl stop disciplina-*";
+        { command = "${pkgs.systemd}/bin/systemctl stop disciplina-*";
           options = [ "NOPASSWD" ]; }
-        { command = "systemctl restart disciplina-*";
+        { command = "${pkgs.systemd}/bin/systemctl restart disciplina-*";
           options = [ "NOPASSWD" ]; }
       ];
       groups = [ "wheel" "nixops" ];
@@ -152,6 +151,7 @@ in
 
   users.mutableUsers = false;
 
+  users.extraGroups.nixops = {};
   users.users = lib.mapAttrs expandUser (import ../keys/ssh.nix);
 
   nixpkgs.config.allowUnfree = true;
