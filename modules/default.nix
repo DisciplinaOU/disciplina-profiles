@@ -78,8 +78,6 @@ in
   security.sudo = {
     extraRules = [
       {
-      ##
-      # Allow members of the `nixops` group, as well as user `buildkite-agent`
       commands = [
         { command = "systemctl start disciplina-*";
           options = [ "NOPASSWD" ]; }
