@@ -56,6 +56,10 @@ in
   # To copy closures around
   nix.trustedUsers = [ "chris" ];
 
+  boot.kernel.sysctl = {
+    "net.core.somaxconn" = 512;
+  };
+
   # services.buildkite-agent = {
   #   enable = true;
   #   name = "dscp-runner";
@@ -156,7 +160,7 @@ in
   networking.firewall.allowedTCPPorts = [ 80 443 ];
   networking.firewall.allowedUDPPorts = [ ports.statsd ];
 
-  systemd.services.nginx.unitConfig = {
+  systemd.services.nginx.serviceConfig = {
     LimitNOFILE = 500000;
     LimitNPROC = 500000;
   };
@@ -166,17 +170,25 @@ in
     appendConfig = ''
       worker_processes auto;
     '';
-    eventsConfig = "worker_connections 1024;";
+    eventsConfig = "worker_connections 16384;";
     upstreams.witness = {
       servers = {
         "witness1:4030" = { };
         "witness2:4030" = { };
         "witness3:4030" = { };
       };
-      extraConfig = "ip_hash;";
+      extraConfig = ''
+        ip_hash;
+        keepalive 32;
+      '';
     };
 
-    upstreams.faucet.servers."localhost:4014" = {};
+    upstreams.faucet = {
+      servers."localhost:4014" = {};
+      extraConfig = ''
+        keepalive 32;
+      '';
+    };
     upstreams.grafana.servers."localhost:${toString ports.grafana}" = {};
     upstreams.prometheus.servers."localhost:${toString ports.prometheus}" = {};
     upstreams.alertManager.servers."localhost:${toString ports.alertManager}" = {};

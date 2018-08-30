@@ -56,6 +56,11 @@ alpha:
 
   networking.firewall.allowedTCPPorts = [ 4030 ];
 
+  services.journald = {
+    rateLimitBurst = 0;
+    rateLimitInterval = "0";
+  };
+
   dscp.keys = {
     committee-secret = { services = [ "disciplina-witness" ]; user = "disciplina"; };
   };
