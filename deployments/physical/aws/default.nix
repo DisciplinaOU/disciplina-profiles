@@ -1,4 +1,4 @@
-{ accessKeyId, domain ? null, region, zone, realDomain ? null, backups ? false, keydir }:
+{ accessKeyId, domain ? null, region, zone, realDomain ? null, backups ? false, keydir, faucetUrl, witnessUrl }:
 
 {
   resources = (import ./resources.nix {
@@ -45,5 +45,5 @@
   witness1 = import ./nodes/witness.nix { n = 1; };
   witness2 = import ./nodes/witness.nix { n = 2; };
   witness3 = import ./nodes/witness.nix { n = 3; };
-  builder = import ./nodes/builder.nix { inherit domain; };
+  builder = import ./nodes/builder.nix { inherit domain faucetUrl witnessUrl; };
 }

@@ -1,4 +1,4 @@
-{ domain }: { config, resources, ... }:
+{ domain, faucetUrl, witnessUrl }: { pkgs, config, resources, ... }:
 
 {
   deployment.ec2 = {
@@ -20,6 +20,9 @@
     grafana.serverName = "grafana.net.${domain}";
     prometheus.serverName = "prometheus.net.${domain}";
     alertManager.serverName = "alertmanager.net.${domain}";
+
+    faucet.locations."/".root = "${pkgs.disciplina-faucet-frontend.override { inherit faucetUrl; }}";
+    explorer.locations."/".root = "${pkgs.disciplina-witness-frontend.override { inherit witnessUrl; }}";
   };
 
   # TODO: Get Route53 access on TMP cluster

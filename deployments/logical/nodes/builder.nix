@@ -207,11 +207,11 @@ in
           # "/api/faucet/v1/index.html".alias = "${pkgs.swagger-ui}.override { baseurl = "/api/faucet/v1/swagger.yaml"; }}/index.html";
           "= /api/faucet/v1/".index = "index.html";
           "/api".proxyPass = "http://faucet";
-          "/".root = "${pkgs.disciplina-faucet-frontend}";
+          # "/".root = "${pkgs.disciplina-faucet-frontend}";
         };
       };
 
-      explorer.locations."/".root = "${pkgs.disciplina-witness-frontend}";
+      # explorer.locations."/".root = "${pkgs.disciplina-witness-frontend}";
       grafana.locations."/".proxyPass = "http://grafana";
       prometheus.locations."/".proxyPass = "http://prometheus";
       alertManager.locations."/".proxyPass = "http://alertManager";
