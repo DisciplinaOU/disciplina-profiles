@@ -35,7 +35,7 @@ in
 
       virtualHost = mkOption {
         default = "derivery";
-	type = types.nullOr types.str;
+        type = types.nullOr types.str;
       };
     };
   };
