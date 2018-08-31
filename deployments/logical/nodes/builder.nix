@@ -53,9 +53,6 @@ in
   nix.maxJobs = 4;
   nix.buildCores = 0;
 
-  # To copy closures around
-  nix.trustedUsers = [ "chris" ];
-
   boot.kernel.sysctl = {
     "net.core.somaxconn" = 512;
   };
