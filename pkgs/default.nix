@@ -5,6 +5,8 @@ let
 in
 
 rec {
+  derivery = callPackage ./derivery {};
+
   nixops-git = callPackage ./nixops-git {
     inherit (final.python2Packages) libvirt;
   };

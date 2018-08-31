@@ -31,6 +31,8 @@ in
 {
   imports = [
     ../keys
+    ./services/derivery.nix
+    ./services/epmd.nix
     ./services/disciplina.nix
     ./services/prometheus.nix
   ];

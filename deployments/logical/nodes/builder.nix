@@ -61,6 +61,12 @@ in
     nixops-git
   ];
 
+  services.derivery = {
+    enable = true;
+    configPath = toString keys.derivery-config;
+    sshKeyPath = toString keys.derivery-ssh;
+  };
+
   users.extraGroups.nixops = {};
   users.users.nixops = {
     isSystemUser = true;
@@ -300,5 +306,7 @@ in
     # grafana-env     = { user = "grafana"; services = [ "grafana" ]; };
     aws-credentials = { user = "nixops"; shared = false; };
     faucet-keyfile  = { user = "disciplina"; services = [ "disciplina-faucet" ]; };
+    derivery-config = { user = "derivery"; services = [ "derivery" ]; };
+    derivery-ssh    = { user = "derivery"; services = [ "derivery" ]; };
   };
 }

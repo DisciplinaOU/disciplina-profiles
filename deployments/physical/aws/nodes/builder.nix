@@ -7,22 +7,23 @@
     elasticIPv4 = resources.elasticIPs.builder-ip;
     securityGroupIds = [
       resources.ec2SecurityGroups.dscp-default-sg.name
-      resources.ec2SecurityGroups.dscp-ssh-public-sg.name
       resources.ec2SecurityGroups.dscp-http-public-sg.name
+      resources.ec2SecurityGroups.dscp-ssh-public-sg.name
       resources.ec2SecurityGroups.dscp-telegraf-private-sg.name
     ];
   };
 
   services.nginx.virtualHosts = {
-    witness.serverName = "witness.${domain}";
-    faucet.serverName = "faucet.${domain}";
+    alertManager.serverName = "alertmanager.net.${domain}";
+    derivery.serverName = "derivery.net.${domain}";
     explorer.serverName = "explorer.${domain}";
+    faucet.serverName = "faucet.${domain}";
     grafana.serverName = "grafana.net.${domain}";
     prometheus.serverName = "prometheus.net.${domain}";
-    alertManager.serverName = "alertmanager.net.${domain}";
+    witness.serverName = "witness.${domain}";
 
-    faucet.locations."/".root = "${pkgs.disciplina-faucet-frontend.override { inherit faucetUrl; }}";
     explorer.locations."/".root = "${pkgs.disciplina-witness-frontend.override { inherit witnessUrl; }}";
+    faucet.locations."/".root = "${pkgs.disciplina-faucet-frontend.override { inherit faucetUrl; }}";
   };
 
   # TODO: Get Route53 access on TMP cluster
