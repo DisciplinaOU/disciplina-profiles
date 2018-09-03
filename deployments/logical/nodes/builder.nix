@@ -53,50 +53,19 @@ in
   nix.maxJobs = 4;
   nix.buildCores = 0;
 
-  # To copy closures around
-  nix.trustedUsers = [ "chris" ];
-
   boot.kernel.sysctl = {
     "net.core.somaxconn" = 512;
   };
 
-  # services.buildkite-agent = {
-  #   enable = true;
-  #   name = "dscp-runner";
-  #   package = pkgs.buildkite-agent3;
-  #   runtimePackages = with pkgs; [
-  #     # Basics
-  #     bash nix gnutar gzip
-  #     # git checkout fails without this because .gitattributes defines it as clean/smudge filter
-  #     git-crypt
-  #   ];
-  #   tokenPath = toString keys.buildkite-token;
-  #   meta-data = "queue=dscp,nix=true,nixops=true";
-  #   openssh.privateKeyPath = toString keys.buildkite-ssh-private;
-  #   openssh.publicKeyPath = toString keys.buildkite-ssh-public;
-  #   extraConfig = ''
-  #     shell="${pkgs.bash}/bin/bash -e -c"
-  #   '';
-  # };
-
-  # Make sure admins can read/write the nixops state file to allow wrapper script access
-  # users.extraUsers.buildkite-agent.extraGroups = [ "nixops" ];
-  # system.activationScripts.nixops = {
-  #   deps = [];
-  #   text = ''
-  #     chgrp nixops /var/lib/buildkite-agent
-  #     chmod g+rwx /var/lib/buildkite-agent
-
-  #     chgrp -R nixops /var/lib/buildkite-agent/.nixops
-  #     chmod -R g+rw /var/lib/buildkite-agent/.nixops
-  #     chmod g+rwx /var/lib/buildkite-agent/.nixops
-  #   '';
-  # };
-
-
   environment.systemPackages = with pkgs; [
     nixops-git
   ];
+
+  services.derivery = {
+    enable = true;
+    configPath = toString keys.derivery-config;
+    sshKeyPath = toString keys.derivery-ssh;
+  };
 
   users.extraGroups.nixops = {};
   users.users.nixops = {
@@ -334,11 +303,10 @@ in
   # };
 
   dscp.keys = {
-    # buildkite-token =       { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
-    # buildkite-ssh-private = { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
-    # buildkite-ssh-public =  { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
     # grafana-env     = { user = "grafana"; services = [ "grafana" ]; };
     aws-credentials = { user = "nixops"; shared = false; };
     faucet-keyfile  = { user = "disciplina"; services = [ "disciplina-faucet" ]; };
+    derivery-config = { user = "derivery"; services = [ "derivery" ]; };
+    derivery-ssh    = { user = "derivery"; services = [ "derivery" ]; };
   };
 }
