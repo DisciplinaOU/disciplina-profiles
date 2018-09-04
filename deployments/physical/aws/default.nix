@@ -2,7 +2,7 @@
 
 {
   resources = (import ./resources.nix {
-    inherit region zone accessKeyId;
+    inherit region zone accessKeyId production;
   }) // {
     # route53RecordSets = {
     #   rs-ci = { resources, ... }: {
@@ -41,9 +41,9 @@
     };
   };
 
-  witness0 = import ./nodes/witness.nix { n = 0; internal = true; };
-  witness1 = import ./nodes/witness.nix { n = 1; };
-  witness2 = import ./nodes/witness.nix { n = 2; };
-  witness3 = import ./nodes/witness.nix { n = 3; };
+  witness0 = import ./nodes/witness.nix { inherit production; n = 0; internal = true; };
+  witness1 = import ./nodes/witness.nix { inherit production; n = 1; };
+  witness2 = import ./nodes/witness.nix { inherit production; n = 2; };
+  witness3 = import ./nodes/witness.nix { inherit production; n = 3; };
   builder = import ./nodes/builder.nix { inherit domain faucetUrl witnessUrl production; };
 }

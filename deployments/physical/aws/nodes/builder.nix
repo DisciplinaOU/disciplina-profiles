@@ -4,7 +4,7 @@
   deployment.ec2 = {
     instanceType = "c5.xlarge";
     ebsInitialRootDiskSize = 300;
-    elasticIPv4 = resources.elasticIPs.builder-ip;
+    elasticIPv4 = if production then resources.elasticIPs.builder-ip else "";
     securityGroupIds = [
       resources.ec2SecurityGroups.dscp-default-sg.name
       resources.ec2SecurityGroups.dscp-http-public-sg.name

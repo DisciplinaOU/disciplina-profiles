@@ -1,10 +1,11 @@
-{ n, internal ? false }: { config, lib, resources, ... }:
+{ n, internal ? false, production ? false }: { config, lib, resources, ... }:
 
 {
   deployment.ec2 = {
     instanceType = "c5.xlarge";
     ebsInitialRootDiskSize = 30;
-    elasticIPv4 = lib.mkIf (n != 0) resources.elasticIPs."witness${toString n}-ip";
+    elasticIPv4 = if (n != 0) && production then resources.elasticIPs."witness${toString n}-ip" else "";
+
     # Witness nodes don't allow SSH on public interface
     usePrivateIpAddress = true;
     securityGroupIds = [
