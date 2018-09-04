@@ -64,7 +64,7 @@ in
     runtimePackages = with pkgs; [
       # Basics
       bash nix gnutar gzip
-      # git checkout fails without this because .gitattributes defines it as clean/smudge filter
+      # clean/smudge filter for git checkout
       git-crypt
     ];
     tokenPath = toString keys.buildkite-token;
@@ -75,6 +75,10 @@ in
       shell="${pkgs.bash}/bin/bash -e -c"
     '';
   };
+
+  # Do not mess with the BK agent service
+  systemd.services.buildkite-agent.restartIfChanged = false;
+  systemd.services.buildkite-agent.stopIfChanged = false;
 
   # Make sure admins can read/write the nixops state file to allow wrapper script access
   users.extraUsers.buildkite-agent.extraGroups = [ "nixops" ];

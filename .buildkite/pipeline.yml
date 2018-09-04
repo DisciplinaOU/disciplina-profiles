@@ -6,15 +6,35 @@ steps:
     agents:
       queue: dscp
 
-  - label: nixops
+  # FIXME: deduplicate commands between deployments
+  - label: nixops production
     command:
       # This is fun when it needs to restart the BK agent service =)
-      # - nix-shell --run 'nixops deploy -d dscp-stg --include builder'
+      - nix-shell --run 'nixops deploy -d dscp-tmp --include builder'
 
       # Abort if the statefile is locked by wrapper script
       - stat /var/lib/buildkite-agent/.nixops/nixops-lock && exit 1
-      - nix-shell --run 'nixops deploy -d dscp-tmp --exclude builder --allow-reboot'
+      - nix-shell --run 'nixops deploy -d dscp-tmp --exclude builder witness0 --allow-reboot'
+      - sleep 2m
+      - nix-shell --run 'nixops deploy -d dscp-tmp --include witness0 --allow-reboot'
     timeout_in_minutes: 180
     branches: master
     agents:
       queue: dscp
+      production: true
+
+  - label: nixops staging
+    command:
+      # This is fun when it needs to restart the BK agent service =)
+      - nix-shell --run 'nixops deploy -d dscp-stg --include builder'
+
+      # Abort if the statefile is locked by wrapper script
+      - stat /var/lib/buildkite-agent/.nixops/nixops-lock && exit 1
+      - nix-shell --run 'nixops deploy -d dscp-stg --exclude builder witness0 --allow-reboot'
+      - sleep 2m
+      - nix-shell --run 'nixops deploy -d dscp-stg --include witness0 --allow-reboot'
+    timeout_in_minutes: 180
+    branches: develop
+    agents:
+      queue: dscp
+      staging: true
