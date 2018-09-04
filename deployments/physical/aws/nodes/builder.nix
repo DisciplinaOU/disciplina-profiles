@@ -26,7 +26,7 @@
     faucet.locations."/".root = "${pkgs.disciplina-faucet-frontend.override { inherit faucetUrl; }}";
   };
 
-  services.buildkite-agent = lib.mkIf production "production=true";
+  services.buildkite-agent.meta-data = if production then "production=true" else "staging=true";
 
   # TODO: Get Route53 access on TMP cluster
   # deployment.route53.usePublicDNSName = true;
