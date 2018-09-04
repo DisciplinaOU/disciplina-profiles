@@ -8,4 +8,5 @@ import ./. rec {
   keydir = "production";
   region = "eu-central-1"; # Frankfurt
   zone = "${region}a";
+  production = true;
 }

@@ -1,4 +1,4 @@
-{ domain, faucetUrl, witnessUrl }: { pkgs, config, resources, ... }:
+{ domain, faucetUrl, witnessUrl, production ? false }: { pkgs, lib, config, resources, ... }:
 
 {
   deployment.ec2 = {
@@ -25,6 +25,8 @@
     explorer.locations."/".root = "${pkgs.disciplina-witness-frontend.override { inherit witnessUrl; }}";
     faucet.locations."/".root = "${pkgs.disciplina-faucet-frontend.override { inherit faucetUrl; }}";
   };
+
+  services.buildkite-agent = lib.mkIf production "production=true";
 
   # TODO: Get Route53 access on TMP cluster
   # deployment.route53.usePublicDNSName = true;
