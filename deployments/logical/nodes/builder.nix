@@ -336,9 +336,9 @@ in
   # };
 
   dscp.keys = {
-    # buildkite-token =       { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
-    # buildkite-ssh-private = { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
-    # buildkite-ssh-public =  { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
+    buildkite-token =       { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
+    buildkite-ssh-private = { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
+    buildkite-ssh-public =  { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
     # grafana-env     = { user = "grafana"; services = [ "grafana" ]; };
     aws-credentials = { user = "nixops"; shared = false; };
     faucet-keyfile  = { user = "disciplina"; services = [ "disciplina-faucet" ]; };
