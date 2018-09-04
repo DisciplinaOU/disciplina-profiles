@@ -62,7 +62,7 @@ in
   ];
 
   services.derivery = {
-    enable = true;
+    enable = false;
     configPath = toString keys.derivery-config;
     sshKeyPath = toString keys.derivery-ssh;
   };
