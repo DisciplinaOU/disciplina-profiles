@@ -246,7 +246,7 @@ in
             slack_configs = [
               {
                 send_resolved = true;
-                channel = "#devops-alerts";
+                channel = "#devops-alerts-dscp";
                 username = "prometheus";
               }
             ];
