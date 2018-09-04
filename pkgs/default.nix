@@ -5,7 +5,8 @@ let
 in
 
 rec {
-  derivery = callPackage ./derivery {};
+  buildkite-agent3 = callPackage ./buildkite-agent3 {};
+  buildkite-agent = final.buildkite-agent3; # todo: fix in nixpkgs
 
   nixops-git = callPackage ./nixops-git {
     inherit (final.python2Packages) libvirt;
