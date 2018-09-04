@@ -118,7 +118,7 @@ Bear in mind that you need the following in your `~/.ssh/config`:
 
 ```
 Host tmp.builder
-  hostname ec2-13-231-105-137.ap-northeast-1.compute.amazonaws.com
+  hostname 3.120.72.226
 ```
 
 And also that rebooting the builder node will close the sshfs connection,
