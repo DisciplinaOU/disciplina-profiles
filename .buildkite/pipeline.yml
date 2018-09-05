@@ -4,10 +4,9 @@ steps:
       - nix-shell --run 'nix-build -I ssh-key=$HOME/.ssh/id_rsa -A dscp-servers'
     timeout_in_minutes: 180
     agents:
-      nix: true
+      queue: dscp
 
-  # FIXME: deduplicate commands between deployments
-  - label: nixops production
+  - label: deploy staging
     command:
       - sudo -u nixops nix-shell --run 'nixops deploy -d dscp-tmp --include builder'
       # Abort if the statefile is locked by wrapper script
@@ -19,32 +18,4 @@ steps:
     branches: master
     agents:
       queue: dscp
-      deploy-target: production
-
-  - label: nixops staging
-    command:
-      - sudo -u nixops nix-shell --run 'nixops deploy -d dscp-stg --include builder'
-      # Abort if the statefile is locked by wrapper script
-      - stat /var/lib/buildkite-agent/.nixops/nixops-lock && exit 1
-      - sudo -u nixops nix-shell --run 'nixops deploy -d dscp-stg --exclude builder witness0 --allow-reboot'
-      - sleep 2m
-      - sudo -u nixops nix-shell --run 'nixops deploy -d dscp-stg --include witness0 --allow-reboot'
-    timeout_in_minutes: 180
-    branches: develop
-    agents:
-      queue: dscp
       deploy-target: staging
-
-  - label: nixops testing
-    command:
-      - sudo -u nixops nix-shell --run 'nixops deploy -d dscp-testing --include builder'
-      # Abort if the statefile is locked by wrapper script
-      - stat /var/lib/buildkite-agent/.nixops/nixops-lock && exit 1
-      - sudo -u nixops nix-shell --run 'nixops deploy -d dscp-testing --exclude builder witness0 --allow-reboot'
-      - sleep 2m
-      - sudo -u nixops nix-shell --run 'nixops deploy -d dscp-testing --include witness0 --allow-reboot'
-    timeout_in_minutes: 180
-    branches: develop
-    agents:
-      queue: dscp
-      deploy-target: testing
