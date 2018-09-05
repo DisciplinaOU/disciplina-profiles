@@ -44,7 +44,7 @@ let
         annotations:
           summary: "File system on {{ $labels.instance }} is filling up."
           description: "File system {{ $labels.mountpoint }} on {{ $labels.instance }} has been over 80% full for over 12 hours."
-  '';
+        '';
 in
 {
   nix = {
@@ -52,315 +52,315 @@ in
     useSandbox = false;
 
     # Default = slow
-    maxJobs = 4;
-    buildCores = 0;
+      maxJobs = 4;
+      buildCores = 0;
 
-    binaryCaches = [
-      "https://serokell.cachix.org"
-    ];
-    binaryCachePublicKeys = [
-      "serokell.cachix.org-1:5DscEJD6c1dD1Mc/phTIbs13+iW22AVbx0HqiSb+Lq8="
-    ];
-  };
-
-  boot.kernel.sysctl = {
-    "net.core.somaxconn" = 512;
-  };
-
-  services.buildkite-agent = {
-    enable = true;
-    name = "dscp-runner";
-    package = pkgs.buildkite-agent3;
-    runtimePackages = with pkgs; [
-      # Basics
-      bash nix gnutar gzip
-      # clean/smudge filter for git checkout
-      git-crypt
-    ];
-    tokenPath = toString keys.buildkite-token;
-    openssh.privateKeyPath = toString keys.buildkite-ssh-private;
-    openssh.publicKeyPath = toString keys.buildkite-ssh-public;
-    extraConfig = ''
-      shell="${pkgs.bash}/bin/bash -e -c"
-    '';
-  };
-
-  # Do not mess with the BK agent service during system reconf
-  systemd.services.buildkite-agent = {
-    restartIfChanged = false;
-    stopIfChanged = false;
-
-    # Wait for existing jobs to finish, then restart service
-    serviceConfig = {
-      TimeOutStopSec = "5min";
-      KillMode = "mixed";
-    };
-  };
-
-  # Make sure admins can read/write the nixops state file to allow wrapper script access
-  users.extraUsers.buildkite-agent.extraGroups = [ "nixops" ];
-  system.activationScripts.nixops = {
-    deps = [];
-    text = ''
-      chgrp nixops /var/lib/buildkite-agent
-      chmod g+rwx /var/lib/buildkite-agent
-    '';
-  };
-
-  environment.systemPackages = with pkgs; [
-    nixops-git
-  ];
-
-  services.derivery = {
-    enable = false;
-    configPath = toString keys.derivery-config;
-    sshKeyPath = toString keys.derivery-ssh;
-  };
-
-  users.extraGroups.nixops = {};
-  users.users.nixops = {
-    isSystemUser = true;
-    group = "nixops";
-    # keys: read nixops ephemeral keys
-    # users: read nix files from user homes
-    extraGroups = [ "keys" "users" ];
-    home = "/var/lib/nixops";
-    createHome = true;
-  };
-
-  security.sudo = {
-    extraRules = [
-      {
-      ##
-      # Allow members of the `wheel` group, as well as user `buildkite-agent`
-      # to execute `nixops deploy` as the `nixops` user.
-      commands = [
-        { command = "${pkgs.nixops-git}/bin/nixops deploy *";
-          options = [ "SETENV" "NOPASSWD" ]; }
-        { command = "${pkgs.nixops-git}/bin/nixops info";
-          options = [ "SETENV" "NOPASSWD" ]; }
-        { command = "${pkgs.nixops-git}/bin/nixops list";
-          options = [ "SETENV" "NOPASSWD" ]; }
-        { command = "${pkgs.nixops-git}/bin/nixops check";
-          options = [ "SETENV" "NOPASSWD" ]; }
+      binaryCaches = [
+        "https://serokell.cachix.org"
       ];
-      groups = [ "wheel" "nixops" ];
-      users = [ "buildkite-agent" ];
-      runAs = "nixops";
-      }
-    ];
-    extraConfig = ''
-      Defaults env_keep+=NIX_PATH
-    '';
+      binaryCachePublicKeys = [
+        "serokell.cachix.org-1:5DscEJD6c1dD1Mc/phTIbs13+iW22AVbx0HqiSb+Lq8="
+      ];
   };
 
-  system.activationScripts.aws-credentials = {
-    deps = [];
-    text = ''
-      mkdir -p /var/lib/nixops/.aws
-      chmod -R go-rwx /var/lib/nixops/.aws
-      ln -sf /run/keys/aws-credentials /var/lib/nixops/.aws/credentials
-      chown -R nixops:nixops /var/lib/nixops/.aws
-    '';
-  };
-
-  disciplina.faucet = {
-    type = "faucet";
-    config-file = "${pkgs.disciplina-bin}/etc/disciplina/configuration.yaml";
-    config-key = "clusterCi";
-    faucet = {
-      listen = "127.0.0.1:4014";
-      translatedAmount = 20;
-      witnessBackend = "http://witness1:4030";
-      genKey = false;
-      keyFile = keys.faucet-keyfile;
-    };
-  };
-
-  networking.firewall.allowedTCPPorts = [ 80 443 ];
-  networking.firewall.allowedUDPPorts = [ ports.statsd ];
-
-  systemd.services.nginx.serviceConfig = {
-    LimitNOFILE = 500000;
-    LimitNPROC = 500000;
-  };
-
-  services.nginx = {
-    enable = true;
-    appendConfig = ''
-      worker_processes auto;
-    '';
-    commonHttpConfig = ''
-      access_log syslog:server=unix:/dev/log,tag=nginx,severity=info combined;
-    '';
-    eventsConfig = "worker_connections 16384;";
-    upstreams.witness = {
-      servers = {
-        "witness1:4030" = { };
-        "witness2:4030" = { };
-        "witness3:4030" = { };
-      };
-      extraConfig = ''
-        ip_hash;
-        keepalive 32;
-      '';
+    boot.kernel.sysctl = {
+      "net.core.somaxconn" = 512;
     };
 
-    upstreams.faucet = {
-      servers."localhost:4014" = {};
-      extraConfig = ''
-        keepalive 32;
-      '';
-    };
-    upstreams.grafana.servers."localhost:${toString ports.grafana}" = {};
-    upstreams.prometheus.servers."localhost:${toString ports.prometheus}" = {};
-    upstreams.alertManager.servers."localhost:${toString ports.alertManager}" = {};
-
-    virtualHosts = {
-      witness = {
-        default = true;
-        locations."/".proxyPass = "http://witness";
-      };
-
-      faucet = {
-        locations = {
-          # "/api/faucet/v1/index.html".alias = "${pkgs.swagger-ui}.override { baseurl = "/api/faucet/v1/swagger.yaml"; }}/index.html";
-          "= /api/faucet/v1/".index = "index.html";
-          "/api".proxyPass = "http://faucet";
-          # "/".root = "${pkgs.disciplina-faucet-frontend}";
-        };
-      };
-
-      # explorer.locations."/".root = "${pkgs.disciplina-witness-frontend}";
-      grafana.locations."/".proxyPass = "http://grafana";
-      prometheus.locations."/".proxyPass = "http://prometheus";
-      alertManager.locations."/".proxyPass = "http://alertManager";
-    };
-  };
-
-  services.prometheus = {
-    enable = true;
-    listenAddress = "0.0.0.0:${toString ports.prometheus}";
-    extraFlags = [
-      "--web.enable-admin-api"
-    ];
-    configText = ''
-      global:
-        scrape_interval: 15s
-
-      alerting:
-        alertmanagers:
-        - static_configs:
-          - targets:
-            - 'localhost:${toString ports.alertManager}'
-
-      rule_files:
-        - ${rulesFile}
-
-      scrape_configs:
-        - job_name: 'node'
-          static_configs:
-          - targets:
-            - 'builder:${toString ports.exporters.node}'
-            - 'witness0:${toString ports.exporters.node}'
-            - 'witness1:${toString ports.exporters.node}'
-            - 'witness2:${toString ports.exporters.node}'
-            - 'witness3:${toString ports.exporters.node}'
-        - job_name: 'telegraf'
-          static_configs:
-          - targets:
-            - 'builder:${toString ports.telegraf}'
-        - job_name: 'prometheus'
-          static_configs:
-          - targets:
-            - 'builder:${toString ports.prometheus}'
-    '';
-    alertmanager =
-    {
+    services.buildkite-agent = {
       enable = true;
-      # webExternalUrl = with config.services.nginx.virtualHosts.alertManager;
-      #   "http${lib.optionalString (enableSSL || onlySSL || addSSL || forceSSL) "s"}://${serverName}/";
-      webExternalUrl = "https://alertmanager.net.disciplina.io";
+      name = "dscp-runner";
+      package = pkgs.buildkite-agent3;
+      runtimePackages = with pkgs; [
+        # Basics
+        bash nix gnutar gzip
+        # clean/smudge filter for git checkout
+        git-crypt
+      ];
+      tokenPath = toString keys.buildkite-token;
+      openssh.privateKeyPath = toString keys.buildkite-ssh-private;
+      openssh.publicKeyPath = toString keys.buildkite-ssh-public;
+      extraConfig = ''
+        shell="${pkgs.bash}/bin/bash -e -c"
+      '';
+    };
 
-      configuration = {
-        global = {
-          slack_api_url = "https://hooks.slack.com/services/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";
-          smtp_from = "monitoring@serokell.io";
-          smtp_smarthost = "smtp.gmail.com:587";
-          smtp_hello = "builder.net.disciplina.io";
-          smtp_auth_username = "monitoring@serokell.io";
-          smtp_auth_password = "mjusezftwgdnpisi";
+    # Do not mess with the BK agent service during system reconf
+      systemd.services.buildkite-agent = {
+        restartIfChanged = false;
+        stopIfChanged = false;
+
+        # Wait for existing jobs to finish, then restart service
+        serviceConfig = {
+          TimeoutStopSec = "5min";
+          KillMode = "mixed";
         };
-        receivers = [
+      };
+
+      # Make sure admins can read/write the nixops state file to allow wrapper script access
+      users.extraUsers.buildkite-agent.extraGroups = [ "nixops" ];
+      system.activationScripts.nixops = {
+        deps = [];
+        text = ''
+          chgrp nixops /var/lib/buildkite-agent
+          chmod g+rwx /var/lib/buildkite-agent
+        '';
+      };
+
+      environment.systemPackages = with pkgs; [
+        nixops-git
+      ];
+
+      services.derivery = {
+        enable = false;
+        configPath = toString keys.derivery-config;
+        sshKeyPath = toString keys.derivery-ssh;
+      };
+
+      users.extraGroups.nixops = {};
+      users.users.nixops = {
+        isSystemUser = true;
+        group = "nixops";
+        # keys: read nixops ephemeral keys
+        # users: read nix files from user homes
+        extraGroups = [ "keys" "users" ];
+        home = "/var/lib/nixops";
+        createHome = true;
+      };
+
+      security.sudo = {
+        extraRules = [
           {
-            name = "ops";
-            slack_configs = [
-              {
-                send_resolved = true;
-                channel = "#devops-alerts-dscp";
-                username = "prometheus";
-              }
+            ##
+            # Allow members of the `wheel` group, as well as user `buildkite-agent`
+            # to execute `nixops deploy` as the `nixops` user.
+            commands = [
+              { command = "${pkgs.nixops-git}/bin/nixops deploy *";
+                options = [ "SETENV" "NOPASSWD" ]; }
+              { command = "${pkgs.nixops-git}/bin/nixops info";
+                options = [ "SETENV" "NOPASSWD" ]; }
+              { command = "${pkgs.nixops-git}/bin/nixops list";
+                options = [ "SETENV" "NOPASSWD" ]; }
+              { command = "${pkgs.nixops-git}/bin/nixops check";
+                options = [ "SETENV" "NOPASSWD" ]; }
             ];
-            email_configs = [
-              {
-                to = "operations@serokell.io";
-              }
-            ];
+            groups = [ "wheel" "nixops" ];
+            users = [ "buildkite-agent" ];
+            runAs = "nixops";
           }
         ];
+        extraConfig = ''
+          Defaults env_keep+=NIX_PATH
+        '';
+      };
 
-        route = {
-          receiver = "ops";
+      system.activationScripts.aws-credentials = {
+        deps = [];
+        text = ''
+          mkdir -p /var/lib/nixops/.aws
+          chmod -R go-rwx /var/lib/nixops/.aws
+          ln -sf /run/keys/aws-credentials /var/lib/nixops/.aws/credentials
+          chown -R nixops:nixops /var/lib/nixops/.aws
+        '';
+      };
+
+      disciplina.faucet = {
+        type = "faucet";
+        config-file = "${pkgs.disciplina-bin}/etc/disciplina/configuration.yaml";
+        config-key = "clusterCi";
+        faucet = {
+          listen = "127.0.0.1:4014";
+          translatedAmount = 20;
+          witnessBackend = "http://witness1:4030";
+          genKey = false;
+          keyFile = keys.faucet-keyfile;
         };
       };
-    };
 
-  };
+      networking.firewall.allowedTCPPorts = [ 80 443 ];
+      networking.firewall.allowedUDPPorts = [ ports.statsd ];
 
-  services.telegraf = {
-    enable = true;
-    extraConfig = {
-      inputs.statsd = {
-        service_address = ":${toString ports.statsd}";
-        parse_data_dog_tags = true;
-        metric_separator = ".";
-        # protocol = "udp4";
+      systemd.services.nginx.serviceConfig = {
+        LimitNOFILE = 500000;
+        LimitNPROC = 500000;
       };
 
-      outputs.prometheus_client = {
-        listen = ":${toString ports.telegraf}";
-        ## Interval to expire metrics and not deliver to prometheus, 0 == no expiration
-        expiration_interval = "60s";
+      services.nginx = {
+        enable = true;
+        appendConfig = ''
+          worker_processes auto;
+        '';
+        commonHttpConfig = ''
+          access_log syslog:server=unix:/dev/log,tag=nginx,severity=info combined;
+        '';
+        eventsConfig = "worker_connections 16384;";
+        upstreams.witness = {
+          servers = {
+            "witness1:4030" = { };
+            "witness2:4030" = { };
+            "witness3:4030" = { };
+          };
+          extraConfig = ''
+            ip_hash;
+            keepalive 32;
+          '';
+        };
+
+        upstreams.faucet = {
+          servers."localhost:4014" = {};
+          extraConfig = ''
+            keepalive 32;
+          '';
+        };
+        upstreams.grafana.servers."localhost:${toString ports.grafana}" = {};
+        upstreams.prometheus.servers."localhost:${toString ports.prometheus}" = {};
+        upstreams.alertManager.servers."localhost:${toString ports.alertManager}" = {};
+
+        virtualHosts = {
+          witness = {
+            default = true;
+            locations."/".proxyPass = "http://witness";
+          };
+
+          faucet = {
+            locations = {
+              # "/api/faucet/v1/index.html".alias = "${pkgs.swagger-ui}.override { baseurl = "/api/faucet/v1/swagger.yaml"; }}/index.html";
+              "= /api/faucet/v1/".index = "index.html";
+              "/api".proxyPass = "http://faucet";
+              # "/".root = "${pkgs.disciplina-faucet-frontend}";
+            };
+          };
+
+          # explorer.locations."/".root = "${pkgs.disciplina-witness-frontend}";
+          grafana.locations."/".proxyPass = "http://grafana";
+          prometheus.locations."/".proxyPass = "http://prometheus";
+          alertManager.locations."/".proxyPass = "http://alertManager";
+        };
       };
-    };
-  };
 
-  services.grafana = {
-    enable = true;
-    port = ports.grafana;
-    addr = "0.0.0.0";
-    rootUrl = "https://grafana.net.disciplina.io";
-    # extraOptions = {
-    #   AUTH_GOOGLE_ENABLED = "true";
-    #   AUTH_GOOGLE_ALLOWED_DOMAINS = "serokell.io";
-    #   AUTH_GOOGLE_ALLOW_SIGN_UP = "true";
-    # };
-  };
+      services.prometheus = {
+        enable = true;
+        listenAddress = "0.0.0.0:${toString ports.prometheus}";
+        extraFlags = [
+          "--web.enable-admin-api"
+        ];
+        configText = ''
+          global:
+          scrape_interval: 15s
 
-  # systemd.services.grafana.serviceConfig = {
-  #   PermissionsStartOnly = true;
-  #   # EnvironmentFile = "/root/grafana.env";
-  #   # EnvironmentFile = keys.grafana-env;
-  # };
+          alerting:
+          alertmanagers:
+          - static_configs:
+          - targets:
+          - 'localhost:${toString ports.alertManager}'
 
-  dscp.keys = {
-    buildkite-token =       { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
-    buildkite-ssh-private = { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
-    buildkite-ssh-public =  { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
-    # grafana-env     = { user = "grafana"; services = [ "grafana" ]; };
-    aws-credentials = { user = "nixops"; shared = false; };
-    faucet-keyfile  = { user = "disciplina"; services = [ "disciplina-faucet" ]; };
-    # derivery-config = { user = "derivery"; services = [ "derivery" ]; };
-    # derivery-ssh    = { user = "derivery"; services = [ "derivery" ]; };
-  };
+          rule_files:
+          - ${rulesFile}
+
+          scrape_configs:
+          - job_name: 'node'
+          static_configs:
+          - targets:
+          - 'builder:${toString ports.exporters.node}'
+          - 'witness0:${toString ports.exporters.node}'
+          - 'witness1:${toString ports.exporters.node}'
+          - 'witness2:${toString ports.exporters.node}'
+          - 'witness3:${toString ports.exporters.node}'
+          - job_name: 'telegraf'
+          static_configs:
+          - targets:
+          - 'builder:${toString ports.telegraf}'
+          - job_name: 'prometheus'
+          static_configs:
+          - targets:
+          - 'builder:${toString ports.prometheus}'
+        '';
+        alertmanager =
+          {
+            enable = true;
+            # webExternalUrl = with config.services.nginx.virtualHosts.alertManager;
+              #   "http${lib.optionalString (enableSSL || onlySSL || addSSL || forceSSL) "s"}://${serverName}/";
+            webExternalUrl = "https://alertmanager.net.disciplina.io";
+
+            configuration = {
+              global = {
+                slack_api_url = "https://hooks.slack.com/services/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";
+                smtp_from = "monitoring@serokell.io";
+                smtp_smarthost = "smtp.gmail.com:587";
+                smtp_hello = "builder.net.disciplina.io";
+                smtp_auth_username = "monitoring@serokell.io";
+                smtp_auth_password = "mjusezftwgdnpisi";
+              };
+              receivers = [
+                {
+                  name = "ops";
+                  slack_configs = [
+                    {
+                      send_resolved = true;
+                      channel = "#devops-alerts-dscp";
+                      username = "prometheus";
+                    }
+                  ];
+                  email_configs = [
+                    {
+                      to = "operations@serokell.io";
+                    }
+                  ];
+                }
+              ];
+
+              route = {
+                receiver = "ops";
+              };
+            };
+          };
+
+      };
+
+      services.telegraf = {
+        enable = true;
+        extraConfig = {
+          inputs.statsd = {
+            service_address = ":${toString ports.statsd}";
+            parse_data_dog_tags = true;
+            metric_separator = ".";
+            # protocol = "udp4";
+          };
+
+          outputs.prometheus_client = {
+            listen = ":${toString ports.telegraf}";
+            ## Interval to expire metrics and not deliver to prometheus, 0 == no expiration
+            expiration_interval = "60s";
+          };
+        };
+      };
+
+      services.grafana = {
+        enable = true;
+        port = ports.grafana;
+        addr = "0.0.0.0";
+        rootUrl = "https://grafana.net.disciplina.io";
+        # extraOptions = {
+          #   AUTH_GOOGLE_ENABLED = "true";
+          #   AUTH_GOOGLE_ALLOWED_DOMAINS = "serokell.io";
+          #   AUTH_GOOGLE_ALLOW_SIGN_UP = "true";
+          # };
+      };
+
+      # systemd.services.grafana.serviceConfig = {
+        #   PermissionsStartOnly = true;
+        #   # EnvironmentFile = "/root/grafana.env";
+        #   # EnvironmentFile = keys.grafana-env;
+        # };
+
+      dscp.keys = {
+        buildkite-token =       { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
+        buildkite-ssh-private = { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
+        buildkite-ssh-public =  { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
+        # grafana-env     = { user = "grafana"; services = [ "grafana" ]; };
+        aws-credentials = { user = "nixops"; shared = false; };
+        faucet-keyfile  = { user = "disciplina"; services = [ "disciplina-faucet" ]; };
+        # derivery-config = { user = "derivery"; services = [ "derivery" ]; };
+        # derivery-ssh    = { user = "derivery"; services = [ "derivery" ]; };
+      };
 }
