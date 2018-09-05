@@ -8,5 +8,5 @@ import ./. rec {
   keydir = "testing";
   region = "eu-west-2";
   zone = "${region}a";
-  queue = "dscp-pr-206";
+  deploy-target = "pr-206";
 }

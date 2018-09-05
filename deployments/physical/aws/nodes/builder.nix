@@ -1,4 +1,4 @@
-{ domain, faucetUrl, witnessUrl, queue, production ? false }: { pkgs, lib, config, resources, ... }:
+{ domain, faucetUrl, witnessUrl, deploy-target, production ? false }: { pkgs, lib, config, resources, ... }:
 
 {
   deployment.ec2 = {
@@ -28,6 +28,5 @@
     faucet.locations."/".root = "${pkgs.disciplina-faucet-frontend.override { inherit faucetUrl; }}";
   };
 
-
-  services.buildkite-agent.meta-data = "nix=true nixops=true queue=${ queue }";
+  services.buildkite-agent.meta-data = "nix=true nixops=true queue=dscp deploy-target=${ deploy-target }";
 }
