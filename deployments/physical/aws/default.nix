@@ -13,7 +13,7 @@
   resources = (import ./resources.nix {
     inherit region zone accessKeyId production;
   }) // {
-    route53RecordSets = {
+    route53RecordSets = if (DNSZone != null) then {
       rs-faucet = { resources, ... }: {
         inherit accessKeyId;
         zoneName = "${DNSZone}.";
@@ -35,7 +35,7 @@
         recordType = "CNAME";
         recordValues = [ "builder.net.${domain}" ];
       };
-    };
+    } else {};
   };
 
   defaults = { resources, config, lib, ... }: {
