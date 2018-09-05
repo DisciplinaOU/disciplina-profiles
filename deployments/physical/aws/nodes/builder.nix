@@ -28,5 +28,5 @@
     faucet.locations."/".root = "${pkgs.disciplina-faucet-frontend.override { inherit faucetUrl; }}";
   };
 
-  services.buildkite-agent.meta-data = "nix=true nixops=true queue=dscp deploy-target=${ deploy-target }";
+  services.buildkite-agent.tags = "nix=true nixops=true queue=dscp deploy-target=${ deploy-target }";
 }
