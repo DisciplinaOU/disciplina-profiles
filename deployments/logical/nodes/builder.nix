@@ -12,6 +12,7 @@ let
     telegraf = 9273;
     statsd = 8125;
   };
+
   rulesFile = pkgs.writeText "rules.yaml" ''
     groups:
     - name: serokell
@@ -46,12 +47,21 @@ let
   '';
 in
 {
-  # stack2nix <3
-  nix.useSandbox = false;
+  nix = {
+    # stack2nix <3
+    useSandbox = false;
 
-  # Default = slow
-  nix.maxJobs = 4;
-  nix.buildCores = 0;
+    # Default = slow
+    maxJobs = 4;
+    buildCores = 0;
+
+    binaryCaches = [
+      "https://serokell.cachix.org"
+    ];
+    binaryCachePublicKeys = [
+      "serokell.cachix.org-1:5DscEJD6c1dD1Mc/phTIbs13+iW22AVbx0HqiSb+Lq8="
+    ];
+  };
 
   boot.kernel.sysctl = {
     "net.core.somaxconn" = 512;
@@ -76,9 +86,17 @@ in
     '';
   };
 
-  # Do not mess with the BK agent service
-  systemd.services.buildkite-agent.restartIfChanged = false;
-  systemd.services.buildkite-agent.stopIfChanged = false;
+  # Do not mess with the BK agent service during system reconf
+  systemd.services.buildkite-agent = {
+    restartIfChanged = false;
+    stopIfChanged = false;
+
+    # Wait for existing jobs to finish, then restart service
+    serviceConfig = {
+      TimeOutStopSec = "5min";
+      KillMode = "mixed";
+    };
+  };
 
   # Make sure admins can read/write the nixops state file to allow wrapper script access
   users.extraUsers.buildkite-agent.extraGroups = [ "nixops" ];
@@ -87,10 +105,6 @@ in
     text = ''
       chgrp nixops /var/lib/buildkite-agent
       chmod g+rwx /var/lib/buildkite-agent
-
-      chgrp -R nixops /var/lib/buildkite-agent/.nixops
-      chmod -R g+rw /var/lib/buildkite-agent/.nixops
-      chmod g+rwx /var/lib/buildkite-agent/.nixops
     '';
   };
 
@@ -140,6 +154,7 @@ in
       Defaults env_keep+=NIX_PATH
     '';
   };
+
   system.activationScripts.aws-credentials = {
     deps = [];
     text = ''

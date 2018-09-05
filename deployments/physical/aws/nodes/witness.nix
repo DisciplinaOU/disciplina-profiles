@@ -23,4 +23,6 @@
         resources.ec2SecurityGroups.dscp-witness-api-public-sg.name
       ]);
   };
+
+  deployment.route53.usePublicDNSName = !production;
 }

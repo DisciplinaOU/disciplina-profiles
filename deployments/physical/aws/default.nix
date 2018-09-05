@@ -1,18 +1,41 @@
-{ accessKeyId, domain ? null, region, zone, realDomain ? null, backups ? false, production ? false, keydir, faucetUrl, witnessUrl }:
+{ accessKeyId
+  , domain ? null
+  , realDomain ? null
+  , DNSZone ? null
+  , region
+  , zone
+  , backups ? false
+  , production ? false
+  , keydir, faucetUrl
+  , witnessUrl }:
 
 {
   resources = (import ./resources.nix {
     inherit region zone accessKeyId production;
   }) // {
-    # route53RecordSets = {
-    #   rs-ci = { resources, ... }: {
-    #     inherit accessKeyId;
-    #     zoneName = "${domain}.";
-    #     domainName = "ci.${domain}.";
-    #     recordType = "CNAME";
-    #     recordValues = [ "builder.${domain}" ];
-    #   };
-    # };
+    route53RecordSets = {
+      rs-faucet = { resources, ... }: {
+        inherit accessKeyId;
+        zoneName = "${DNSZone}.";
+        domainName = "faucet.${domain}.";
+        recordType = "CNAME";
+        recordValues = [ "builder.net.${domain}" ];
+      };
+      rs-explorer = { resources, ... }: {
+        inherit accessKeyId;
+        zoneName = "${DNSZone}.";
+        domainName = "explorer.${domain}.";
+        recordType = "CNAME";
+        recordValues = [ "builder.net.${domain}" ];
+      };
+      rs-witness = { resources, ... }: {
+        inherit accessKeyId;
+        zoneName = "${DNSZone}.";
+        domainName = "witness.${domain}.";
+        recordType = "CNAME";
+        recordValues = [ "builder.net.${domain}" ];
+      };
+    };
   };
 
   defaults = { resources, config, lib, ... }: {
@@ -22,10 +45,10 @@
     ];
     dscp = { inherit keydir; };
 
-    deployment.route53 = lib.mkIf (realDomain != null) {
+    deployment.route53 = {
       inherit accessKeyId;
       usePublicDNSName = lib.mkDefault false;
-      hostName =  "${config.networking.hostName}.${realDomain}";
+      hostName =  "${config.networking.hostName}.net.${realDomain}";
     };
 
     deployment.targetEnv = "ec2";

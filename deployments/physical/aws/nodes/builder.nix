@@ -13,6 +13,8 @@
     ];
   };
 
+  deployment.route53.usePublicDNSName = !production;
+
   services.nginx.virtualHosts = {
     alertManager.serverName = "alertmanager.net.${domain}";
     derivery.serverName = "derivery.net.${domain}";
@@ -26,7 +28,8 @@
     faucet.locations."/".root = "${pkgs.disciplina-faucet-frontend.override { inherit faucetUrl; }}";
   };
 
-  services.buildkite-agent.meta-data = if production then "production=true" else "staging=true";
+
+  # services.buildkite-agent.meta-data = if production then "production=true" else "staging=true";
 
   # TODO: Get Route53 access on TMP cluster
   # deployment.route53.usePublicDNSName = true;
