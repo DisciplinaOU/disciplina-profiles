@@ -78,7 +78,6 @@ in
       git-crypt
     ];
     tokenPath = toString keys.buildkite-token;
-    meta-data = "queue=dscp,nix=true,nixops=true";
     openssh.privateKeyPath = toString keys.buildkite-ssh-private;
     openssh.publicKeyPath = toString keys.buildkite-ssh-public;
     extraConfig = ''
