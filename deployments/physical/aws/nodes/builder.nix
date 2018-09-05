@@ -29,7 +29,7 @@
   };
 
 
-  services.buildkite-agent.meta-data = "nix=true nixops=true queue=dscp ${if production then "production=true" else "testing=true"}";
+  services.buildkite-agent.meta-data = "nix=true nixops=true queue=dscp-${if production then "production" else "testing"}";
 
   # TODO: Get Route53 access on TMP cluster
   # deployment.route53.usePublicDNSName = true;
