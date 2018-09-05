@@ -9,4 +9,5 @@ import ./. rec {
   region = "eu-central-1"; # Frankfurt
   zone = "${region}a";
   production = true;
+  queue = "dscp-production";
 }

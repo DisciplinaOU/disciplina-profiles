@@ -7,4 +7,5 @@ import ./. rec {
   keydir = "testing";
   region = "eu-west-2";
   zone = "${region}a";
+  queue = "dscp-staging";
 }

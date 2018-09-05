@@ -1,4 +1,4 @@
-{ domain, faucetUrl, witnessUrl, production ? false }: { pkgs, lib, config, resources, ... }:
+{ domain, faucetUrl, witnessUrl, queue, production ? false }: { pkgs, lib, config, resources, ... }:
 
 {
   deployment.ec2 = {
@@ -29,8 +29,5 @@
   };
 
 
-  services.buildkite-agent.meta-data = "nix=true nixops=true queue=dscp-${if production then "production" else "testing"}";
-
-  # TODO: Get Route53 access on TMP cluster
-  # deployment.route53.usePublicDNSName = true;
+  services.buildkite-agent.meta-data = "nix=true nixops=true queue=${ queue }";
 }

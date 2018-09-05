@@ -20,8 +20,7 @@ steps:
     timeout_in_minutes: 180
     branches: master
     agents:
-      queue: dscp
-      production: true
+      queue: dscp-production
 
   - label: nixops staging
     command:
@@ -36,5 +35,4 @@ steps:
     timeout_in_minutes: 180
     branches: develop
     agents:
-      queue: dscp
-      staging: true
+      queue: dscp-testing

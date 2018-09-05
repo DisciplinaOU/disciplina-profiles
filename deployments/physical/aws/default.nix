@@ -7,6 +7,7 @@
   , backups ? false
   , production ? false
   , keydir, faucetUrl
+  , queue
   , witnessUrl }:
 
 {
@@ -68,5 +69,5 @@
   witness1 = import ./nodes/witness.nix { inherit production; n = 1; };
   witness2 = import ./nodes/witness.nix { inherit production; n = 2; };
   witness3 = import ./nodes/witness.nix { inherit production; n = 3; };
-  builder = import ./nodes/builder.nix { inherit domain faucetUrl witnessUrl production; };
+  builder  = import ./nodes/builder.nix { inherit domain faucetUrl witnessUrl production queue; };
 }
