@@ -29,3 +29,19 @@ ssh "$TARGET" "sudo mkdir -p $BASEDIR/.aws; \
                sudo ln -sf /run/keys/aws-credentials $BASEDIR/.aws/credentials; \
                sudo chown -R nixops:nixops $BASEDIR/.aws; \
                sudo chmod -R go-rwx $BASEDIR/.aws"
+
+# Clone disciplina and profiles
+ssh -A "$TARGET" "rm -rf disciplina profiles; \
+                  GIT_SSH_COMMAND='ssh -o StrictHostKeyChecking=no' git clone git@github.com:DisciplinaOU/disciplina.git; \
+                  GIT_SSH_COMMAND='ssh -o StrictHostKeyChecking=no' git clone git@github.com:DisciplinaOU/disciplina-profiles.git profiles"
+
+# Unlock git crypt vault in profiles
+MNTDIR=$(mktemp -d)
+CURDIR=$(pwd)
+mkdir -p "$MNTDIR"
+sshfs "$TARGET": "$MNTDIR"
+cd "$MNTDIR"/profiles
+git crypt unlock
+cd "$CURDIR"
+fusermount -u "$MNTDIR"
+rmdir "$MNTDIR"
