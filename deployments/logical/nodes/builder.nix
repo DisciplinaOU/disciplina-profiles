@@ -56,9 +56,11 @@ in
       buildCores = 0;
 
       binaryCaches = [
+        "https://cache.nixos.org"
         "https://serokell.cachix.org"
       ];
       binaryCachePublicKeys = [
+        "serokell-1:aIojg2Vxgv7MkzPJoftOO/I8HKX622sT+c0fjnZBLj0="
         "serokell.cachix.org-1:5DscEJD6c1dD1Mc/phTIbs13+iW22AVbx0HqiSb+Lq8="
       ];
   };
