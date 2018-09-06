@@ -12,9 +12,9 @@ rec {
     inherit (final.python2Packages) libvirt;
   };
 
-  disciplina = (import (fetchGit { url = "ssh://git@github.com:/DisciplinaOU/disciplina"; ref = "master"; }));
+  disciplina = (import (fetchTarball https://github.com/DisciplinaOU/disciplina/archive/master.tar.gz));
   # disciplina = (import <disciplina>);
   disciplina-bin = disciplina.disciplina-bin;
-  disciplina-faucet-frontend = callPackage (import "${fetchGit { url = "ssh://git@github.com:/DisciplinaOU/disciplina-faucet-frontend"; }}/release.nix") {};
-  disciplina-witness-frontend = callPackage (import "${fetchGit { url = "ssh://git@github.com:/DisciplinaOU/disciplina-explorer-frontend"; }}/release.nix") {};
+  disciplina-faucet-frontend = callPackage (import "${fetchTarball https://github.com/DisciplinaOU/disciplina-faucet-frontend/archive/master.tar.gz}/release.nix") {};
+  disciplina-witness-frontend = callPackage (import "${fetchTarball https://github.com/DisciplinaOU/disciplina-explorer-frontend/archive/master.tar.gz}/release.nix") {};
 }
