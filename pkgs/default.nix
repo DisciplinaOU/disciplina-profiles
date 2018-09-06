@@ -15,6 +15,6 @@ rec {
   disciplina = (import (fetchGit { url = "ssh://git@github.com:/DisciplinaOU/disciplina"; ref = "master"; }));
   # disciplina = (import <disciplina>);
   disciplina-bin = disciplina.disciplina-bin;
-  disciplina-faucet-frontend = disciplina.disciplina-faucet-frontend;
-  disciplina-witness-frontend = disciplina.disciplina-witness-frontend;
+  disciplina-faucet-frontend = callPackage (import "${fetchGit { url = "ssh://git@github.com:/DisciplinaOU/disciplina-faucet-frontend"; }}/release.nix") {};
+  disciplina-witness-frontend = callPackage (import "${fetchGit { url = "ssh://git@github.com:/DisciplinaOU/disciplina-explorer-frontend"; }}/release.nix") {};
 }
