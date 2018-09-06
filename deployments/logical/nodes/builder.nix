@@ -89,12 +89,6 @@ in
       systemd.services.buildkite-agent = {
         restartIfChanged = false;
         stopIfChanged = false;
-
-        # Wait for existing jobs to finish, then restart service
-        serviceConfig = {
-          TimeoutStopSec = "5min";
-          KillMode = "mixed";
-        };
       };
 
       # Make sure admins can read/write the nixops state file to allow wrapper script access
