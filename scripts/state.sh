@@ -2,7 +2,7 @@
 set -euo pipefail
 
 DEPLOYMENT="${1:-default}"
-TARGET=$(nixops info -d "$DEPLOYMENT" --plain --no-eval | awk 'BEGIN { FS="\t" } /builder/ { print $5}')
+TARGET=$(nixops export -d "$DEPLOYMENT" | jq ".[] | .resources.builder.publicIpv4")
 SRCDIR="$HOME/dev/serokell/tmp/builder-state"
 BASEDIR='/var/lib/nixops'
 
