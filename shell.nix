@@ -17,5 +17,8 @@ stdenv.mkDerivation {
     "nixpkgs=${toString pkgs.path}"
     "nixpkgs-overlays=${overlays}"
     "dscp-ops=${src}"
+    "disciplina=https://github.com/DisciplinaOU/disciplina/archive/master.tar.gz"
+    "disciplina-faucet=https://github.com/DisciplinaOU/disciplina-faucet-frontend/archive/master.tar.gz"
+    "disciplina-explorer=https://github.com/DisciplinaOU/disciplina-explorer-frontend/archive/master.tar.gz"
   ];
 }
