@@ -24,7 +24,7 @@
     prometheus.serverName = "prometheus.net.${domain}";
     witness.serverName = "witness.${domain}";
 
-    explorer.locations."/".root = "${pkgs.disciplina-witness-frontend.override { inherit witnessUrl; }}";
+    explorer.locations."/".root = "${pkgs.disciplina-explorer-frontend.override { inherit witnessUrl; }}";
     faucet.locations."/".root = "${pkgs.disciplina-faucet-frontend.override { inherit faucetUrl; }}";
   };
 

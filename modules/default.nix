@@ -1,4 +1,4 @@
-{ lib, pkgs, config, name, deploymentName ? "unknown", ... }:
+{ lib, pkgs, config, name, ... }:
 
 let
   wheel = [ "chris" "kirelagin" "yegortimoshenko" "yorick" ];

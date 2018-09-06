@@ -227,7 +227,7 @@ in
             };
           };
 
-          # explorer.locations."/".root = "${pkgs.disciplina-witness-frontend}";
+          # explorer.locations."/".root = "${pkgs.disciplina-explorer-frontend}";
           grafana.locations."/".proxyPass = "http://grafana";
           prometheus.locations."/".proxyPass = "http://prometheus";
           alertManager.locations."/".proxyPass = "http://alertManager";
