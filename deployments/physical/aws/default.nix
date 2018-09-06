@@ -46,7 +46,7 @@
     ];
     dscp = { inherit keydir; };
 
-    deployment.route53 = {
+    deployment.route53 = lib.optionalAttrs (realDomain != null) {
       inherit accessKeyId;
       usePublicDNSName = lib.mkDefault false;
       hostName =  "${config.networking.hostName}.net.${realDomain}";
