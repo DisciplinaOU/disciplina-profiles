@@ -56,7 +56,7 @@
 
     deployment.ec2 = with resources; {
       inherit region accessKeyId;
-      instanceType = "c5.xlarge";
+      instanceType = lib.mkDefault "c5.xlarge";
       associatePublicIpAddress = lib.mkDefault true;
       ebsInitialRootDiskSize = lib.mkDefault 30;
       keyPair = resources.ec2KeyPairs.default;
