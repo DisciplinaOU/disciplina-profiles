@@ -1,19 +1,14 @@
-{ domain, faucetUrl, witnessUrl, deploy-target, production ? false }: { pkgs, lib, config, resources, ... }:
+{ domain, faucetUrl, witnessUrl, deploy-target }: { pkgs, lib, config, resources, ... }:
 
 {
   deployment.ec2 = {
-    instanceType = "c5.xlarge";
     ebsInitialRootDiskSize = 300;
-    elasticIPv4 = if production then resources.elasticIPs.builder-ip else "";
-    securityGroupIds = [
-      resources.ec2SecurityGroups.dscp-default-sg.name
-      resources.ec2SecurityGroups.dscp-http-public-sg.name
-      resources.ec2SecurityGroups.dscp-ssh-public-sg.name
-      resources.ec2SecurityGroups.dscp-telegraf-private-sg.name
+    securityGroups = with resources.ec2SecurityGroups; [
+      dscp-http-public-sg
+      dscp-ssh-public-sg
+      dscp-telegraf-private-sg
     ];
   };
-
-  deployment.route53.usePublicDNSName = !production;
 
   services.nginx.virtualHosts = {
     alertManager.serverName = "alertmanager.net.${domain}";

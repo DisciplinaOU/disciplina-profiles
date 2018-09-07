@@ -2,27 +2,17 @@
 
 {
   deployment.ec2 = {
-    instanceType = "c5.xlarge";
-    ebsInitialRootDiskSize = 30;
-    elasticIPv4 = if (n != 0) && production then resources.elasticIPs."witness${toString n}-ip" else "";
+    elasticIPv4 = lib.mkIf internal (lib.mkForce "");
 
     # Witness nodes don't allow SSH on public interface
     usePrivateIpAddress = true;
-    securityGroupIds = [
-      resources.ec2SecurityGroups.dscp-ssh-private-sg.name
-      resources.ec2SecurityGroups.dscp-default-sg.name
-      ]
+    securityGroups = with resources.ec2SecurityGroups; (
+      [ dscp-ssh-private-sg ]
       ++ (if internal then
-      [
-        resources.ec2SecurityGroups.dscp-witness-private-sg.name
-        resources.ec2SecurityGroups.dscp-witness-api-private-sg.name
-      ]
+      [ dscp-witness-private-sg dscp-witness-api-private-sg ]
       else
-      [
-        resources.ec2SecurityGroups.dscp-witness-public-sg.name
-        resources.ec2SecurityGroups.dscp-witness-api-public-sg.name
-      ]);
+      [ dscp-witness-public-sg dscp-witness-api-public-sg ]
+    ));
   };
 
-  deployment.route53.usePublicDNSName = !production;
 }

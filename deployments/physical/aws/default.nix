@@ -39,7 +39,7 @@
     } else {};
   };
 
-  defaults = { resources, config, lib, ... }: {
+  defaults = { resources, config, lib, name, ... }: {
     imports = [
       "${import ../../../nixpkgs-src.nix}/nixos/modules/virtualisation/amazon-image.nix"
       (import ./ssl.nix { inherit realDomain keydir; })
@@ -48,26 +48,27 @@
 
     deployment.route53 = lib.optionalAttrs (realDomain != null) {
       inherit accessKeyId;
-      usePublicDNSName = lib.mkDefault false;
+      usePublicDNSName = !production;
       hostName =  "${config.networking.hostName}.net.${realDomain}";
     };
 
     deployment.targetEnv = "ec2";
 
-    deployment.ec2 = {
+    deployment.ec2 = with resources; {
       inherit region accessKeyId;
+      instanceType = "c5.xlarge";
       associatePublicIpAddress = lib.mkDefault true;
-      ebsInitialRootDiskSize = lib.mkDefault 50;
+      ebsInitialRootDiskSize = lib.mkDefault 30;
       keyPair = resources.ec2KeyPairs.default;
-      securityGroupIds = [ resources.ec2SecurityGroups.dscp-default-sg.name ];
-      securityGroups = [];
-      subnetId = lib.mkForce resources.vpcSubnets.dscp-subnet;
+      securityGroups = [ ec2SecurityGroups.dscp-default-sg ];
+      subnetId = lib.mkForce vpcSubnets.dscp-subnet;
+      elasticIPv4 = if production then elasticIPs."${name}-ip" else "";
     };
   };
 
-  witness0 = import ./nodes/witness.nix { inherit production; n = 0; internal = true; };
-  witness1 = import ./nodes/witness.nix { inherit production; n = 1; };
-  witness2 = import ./nodes/witness.nix { inherit production; n = 2; };
-  witness3 = import ./nodes/witness.nix { inherit production; n = 3; };
-  builder  = import ./nodes/builder.nix { inherit domain faucetUrl witnessUrl production deploy-target; };
+  witness0 = import ./nodes/witness.nix { n = 0; internal = true; };
+  witness1 = import ./nodes/witness.nix { n = 1; };
+  witness2 = import ./nodes/witness.nix { n = 2; };
+  witness3 = import ./nodes/witness.nix { n = 3; };
+  builder  = import ./nodes/builder.nix { inherit domain faucetUrl witnessUrl deploy-target; };
 }
