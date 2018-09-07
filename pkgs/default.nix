@@ -5,9 +5,6 @@ let
 in
 
 rec {
-  buildkite-agent3 = callPackage ./buildkite-agent3 {};
-  buildkite-agent = final.buildkite-agent3; # todo: fix in nixpkgs
-
   nixops-git = callPackage ./nixops-git {
     inherit (final.python2Packages) libvirt;
   };
@@ -18,6 +15,6 @@ rec {
 
   disciplina = (import <disciplina>);
   disciplina-bin = disciplina.disciplina-bin;
-  disciplina-faucet-frontend = callPackage (import <disciplina-faucet/release.nix>) {};
-  disciplina-explorer-frontend = callPackage (import <disciplina-explorer/release.nix>) {};
+  disciplina-faucet-frontend = callPackage <disciplina-faucet/release.nix> {};
+  disciplina-explorer-frontend = callPackage <disciplina-explorer/release.nix> {};
 }
