@@ -3,10 +3,10 @@
 {
   deployment.ec2 = {
     ebsInitialRootDiskSize = 300;
-    securityGroups = with resources.ec2SecurityGroups; [
-      dscp-http-public-sg
-      dscp-ssh-public-sg
-      dscp-telegraf-private-sg
+    securityGroupIds = with resources.ec2SecurityGroups; [
+      dscp-http-public-sg.name
+      dscp-ssh-public-sg.name
+      dscp-telegraf-private-sg.name
     ];
   };
 

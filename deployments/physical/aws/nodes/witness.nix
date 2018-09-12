@@ -6,12 +6,12 @@
 
     # Witness nodes don't allow SSH on public interface
     usePrivateIpAddress = true;
-    securityGroups = with resources.ec2SecurityGroups; (
-      [ dscp-ssh-private-sg ]
+    securityGroupIds = with resources.ec2SecurityGroups; (
+      [ dscp-ssh-private-sg.name ]
       ++ (if internal then
-      [ dscp-witness-private-sg dscp-witness-api-private-sg ]
+      [ dscp-witness-private-sg.name dscp-witness-api-private-sg.name ]
       else
-      [ dscp-witness-public-sg dscp-witness-api-public-sg ]
+      [ dscp-witness-public-sg.name dscp-witness-api-public-sg.name ]
     ));
   };
 

@@ -60,7 +60,7 @@
       associatePublicIpAddress = lib.mkDefault true;
       ebsInitialRootDiskSize = lib.mkDefault 30;
       keyPair = resources.ec2KeyPairs.default;
-      securityGroups = [ ec2SecurityGroups.dscp-default-sg ];
+      securityGroupIds = [ ec2SecurityGroups.dscp-default-sg.name ];
       subnetId = lib.mkForce vpcSubnets.dscp-subnet;
       elasticIPv4 = if production then elasticIPs."${name}-ip" else "";
     };
