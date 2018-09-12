@@ -31,8 +31,6 @@ in
 {
   imports = [
     ../keys
-    ./services/derivery.nix
-    ./services/epmd.nix
     ./services/disciplina.nix
     ./services/prometheus.nix
   ];
@@ -92,25 +90,7 @@ in
       }
     ];
   };
-
-  services.fail2ban = {
-    enable = true;
-    # Ban repeat offenders longer:
-    jails.recidive = ''
-      filter = recidive
-      action = iptables-allports[name=recidive]
-      maxretry = 5
-      bantime = 604800 ; 1 week
-      findtime = 86400 ; 1 day
-    '';
-    jails.DEFAULT = ''
-      ignoreip = 127.0.0.1/8 84.81.255.167
-    '';
-    jails.ssh-iptables = ''
-      maxretry = 10
-      mode     = aggressive
-    '';
-  };
+  services.sshguard.enable = true;
 
   nix.gc = {
     automatic = true;
@@ -118,11 +98,6 @@ in
     # delete-older-than by itself will still delete all non-referenced packages (ie build dependencies)
     options = ''--max-freed "$((15 * 1024**3 - 1024 * $(df -P -k /nix/store | tail -n 1 | ${pkgs.gawk}/bin/awk '{ print $4 }')))" --delete-older-than 14d'';
   };
-
-  # https://github.com/NixOS/nix/issues/1964
-  nix.extraOptions = ''
-    tarball-ttl = 0
-  '';
 
   services.nginx = {
     # https://github.com/NixOS/nixpkgs/issues/25485
