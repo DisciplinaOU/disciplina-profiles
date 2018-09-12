@@ -107,12 +107,6 @@ in
         nixops-git
       ];
 
-      services.derivery = {
-        enable = false;
-        configPath = toString keys.derivery-config;
-        sshKeyPath = toString keys.derivery-ssh;
-      };
-
       users.extraGroups.nixops = {};
       users.users.nixops = {
         isSystemUser = true;
@@ -223,11 +217,15 @@ in
               # "/api/faucet/v1/index.html".alias = "${pkgs.swagger-ui}.override { baseurl = "/api/faucet/v1/swagger.yaml"; }}/index.html";
               "= /api/faucet/v1/".index = "index.html";
               "/api".proxyPass = "http://faucet";
-              # "/".root = "${pkgs.disciplina-faucet-frontend}";
+              "/".root = "${pkgs.disciplina-faucet-frontend}";
             };
           };
 
-          # explorer.locations."/".root = "${pkgs.disciplina-explorer-frontend}";
+          explorer.locations = {
+            "/api".proxyPass = "http://witness";
+            "/".root = "${pkgs.disciplina-explorer-frontend}";
+          };
+      
           grafana.locations."/".proxyPass = "http://grafana";
           prometheus.locations."/".proxyPass = "http://prometheus";
           alertManager.locations."/".proxyPass = "http://alertManager";
@@ -356,7 +354,5 @@ in
         # grafana-env     = { user = "grafana"; services = [ "grafana" ]; };
         aws-credentials = { user = "nixops"; shared = false; };
         faucet-keyfile  = { user = "disciplina"; services = [ "disciplina-faucet" ]; };
-        # derivery-config = { user = "derivery"; services = [ "derivery" ]; };
-        # derivery-ssh    = { user = "derivery"; services = [ "derivery" ]; };
       };
 }
