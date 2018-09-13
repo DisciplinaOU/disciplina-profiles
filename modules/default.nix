@@ -1,4 +1,4 @@
-{ lib, pkgs, config, name, ... }:
+{ lib, pkgs, config, name, deploymentName, ... }:
 
 let
   wheel = [ "chris" "kirelagin" "yegortimoshenko" "yorick" ];
@@ -8,24 +8,9 @@ let
     isNormalUser = true;
     openssh.authorizedKeys.keys = keys;
   };
-  getGitRev = pkgs.stdenv.mkDerivation {
-    name = "get-git-revision";
-    src = ./..;
-    buildInputs = [ pkgs.git pkgs.git-crypt ];
-    buildCommand = ''
-      cd $src
-      (echo {
-      echo description = \"$(git describe --all --dirty)\"";"
-      echo revision = \"$(git rev-parse --verify HEAD)\"";"
-      echo }) > $out
-    '';
-  };
-  GITDESC = builtins.getEnv "GITDESC";
-  # try the environment variables (set by the wrapper/ci) first, fall back to getGitRev if a .git dir exists
-  gitinfo = if GITDESC == "" && builtins.readDir ./.. ? ".git" then import "${getGitRev}" else {
-    description = GITDESC;
-    revision = builtins.getEnv "GITREV";
-  };
+  gitinfo = builtins.readDir ./.. ? ".git" then {
+    revision = lib.commitIdFromGitRepo ../.git;
+  } else { revision = "unknown"; };
 in
 
 {
@@ -75,20 +60,6 @@ in
 
   security.sudo = {
     wheelNeedsPassword = false;
-    extraRules = [
-      {
-      commands = [
-        { command = "${pkgs.systemd}/bin/systemctl start disciplina-*";
-          options = [ "NOPASSWD" ]; }
-        { command = "${pkgs.systemd}/bin/systemctl stop disciplina-*";
-          options = [ "NOPASSWD" ]; }
-        { command = "${pkgs.systemd}/bin/systemctl restart disciplina-*";
-          options = [ "NOPASSWD" ]; }
-      ];
-      groups = [ "wheel" "nixops" ];
-      runAs = "root";
-      }
-    ];
   };
   services.sshguard.enable = true;
 
@@ -116,10 +87,17 @@ in
     node = {
       enable = true;
       openFirewall = true;
-      enabledCollectors = [ "systemd" ];
+      enabledCollectors = [ "systemd" "logind" ];
       disabledCollectors = [ "timex" ];
+      extraFlags = ["--collector.textfile.directory /etc/node-exporter"];
     };
   };
+  };
+  environment.etc."node-exporter/server_info.prom".text = ''
+    # HELP nix_desc NixOps deployment info
+    # TYPE nix_desc gauge
+    nix_desc{deploymentName="${deploymentName}", nodename="${name}", deployer="${builtins.getEnv "USER"}", rev="${gitinfo.revision}"} 1
+  '';
 
   services.openssh = {
     enable = true;
