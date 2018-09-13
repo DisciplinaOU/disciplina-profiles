@@ -92,7 +92,6 @@ in
       extraFlags = ["--collector.textfile.directory /etc/node-exporter"];
     };
   };
-  };
   environment.etc."node-exporter/server_info.prom".text = ''
     # HELP nix_desc NixOps deployment info
     # TYPE nix_desc gauge
