@@ -1,4 +1,4 @@
-{ n, internal ? false, production ? false }: { config, lib, resources, ... }:
+{ internal ? false }: { config, lib, resources, ... }:
 
 {
   deployment.ec2 = {

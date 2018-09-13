@@ -1,11 +1,8 @@
 import ./. rec {
   accessKeyId = "srk-staging";
-  domain = "dscp.serokell.review";
-  realDomain = "dscp.serokell.review"; # TODO: issues. should be CNAME'd
-  faucetUrl = "http://faucet.dscp.serokell.review";
-  witnessUrl = "http://witness.dscp.serokell.review";
+  logical-domain = "dscp.serokell.review";
   keydir = "testing";
   region = "eu-west-2";
   zone = "${region}a";
-  deploy-target = "staging";
+  hasRoute53 = true;
 }

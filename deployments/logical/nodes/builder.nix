@@ -63,90 +63,6 @@ in
       "net.core.somaxconn" = 512;
     };
 
-    services.buildkite-agent = {
-      enable = true;
-      name = "dscp-runner";
-      package = pkgs.buildkite-agent3;
-      runtimePackages = with pkgs; [
-        # Basics
-        bash nix gnutar gzip
-        # clean/smudge filter for git checkout
-        git-crypt
-      ];
-      tokenPath = toString keys.buildkite-token;
-      openssh.privateKeyPath = toString keys.buildkite-ssh-private;
-      openssh.publicKeyPath = toString keys.buildkite-ssh-public;
-      extraConfig = ''
-        shell="${pkgs.bash}/bin/bash -e -c"
-      '';
-    };
-
-    # Do not mess with the BK agent service during system reconf
-      systemd.services.buildkite-agent = {
-        restartIfChanged = false;
-        stopIfChanged = false;
-      };
-
-      # Make sure admins can read/write the nixops state file to allow wrapper script access
-      users.extraUsers.buildkite-agent.extraGroups = [ "nixops" ];
-      system.activationScripts.nixops = {
-        deps = [];
-        text = ''
-          chgrp nixops /var/lib/buildkite-agent
-          chmod g+rwx /var/lib/buildkite-agent
-        '';
-      };
-
-      environment.systemPackages = with pkgs; [
-        nixops-git
-      ];
-
-      users.extraGroups.nixops = {};
-      users.users.nixops = {
-        isSystemUser = true;
-        group = "nixops";
-        # keys: read nixops ephemeral keys
-        # users: read nix files from user homes
-        extraGroups = [ "keys" "users" ];
-        home = "/var/lib/nixops";
-        createHome = true;
-      };
-
-      security.sudo = {
-        extraRules = [
-          {
-            ##
-            # Allow members of the `wheel` group, as well as user `buildkite-agent`
-            # to execute `nixops deploy` as the `nixops` user.
-            commands = [
-              { command = "${pkgs.nixops-git}/bin/nixops deploy *";
-                options = [ "SETENV" "NOPASSWD" ]; }
-              { command = "${pkgs.nixops-git}/bin/nixops info";
-                options = [ "SETENV" "NOPASSWD" ]; }
-              { command = "${pkgs.nixops-git}/bin/nixops list";
-                options = [ "SETENV" "NOPASSWD" ]; }
-              { command = "${pkgs.nixops-git}/bin/nixops check";
-                options = [ "SETENV" "NOPASSWD" ]; }
-            ];
-            groups = [ "wheel" "nixops" ];
-            users = [ "buildkite-agent" ];
-            runAs = "nixops";
-          }
-        ];
-        extraConfig = ''
-          Defaults env_keep+=NIX_PATH
-        '';
-      };
-
-      system.activationScripts.aws-credentials = {
-        deps = [];
-        text = ''
-          mkdir -p /var/lib/nixops/.aws
-          chmod -R go-rwx /var/lib/nixops/.aws
-          ln -sf /run/keys/aws-credentials /var/lib/nixops/.aws/credentials
-          chown -R nixops:nixops /var/lib/nixops/.aws
-        '';
-      };
 
       disciplina.faucet = {
         type = "faucet";
@@ -272,10 +188,6 @@ in
 
       dscp.keys = {
         alertmanager-token =    { services = [ "alertmanager" ]; user = "alertmanager"; };
-        buildkite-token =       { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
-        buildkite-ssh-private = { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
-        buildkite-ssh-public =  { services = [ "buildkite-agent" ]; user = "buildkite-agent"; };
-        aws-credentials = { user = "nixops"; shared = false; };
         faucet-keyfile  = { user = "disciplina"; services = [ "disciplina-faucet" ]; };
       };
 }

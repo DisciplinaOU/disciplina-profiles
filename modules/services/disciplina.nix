@@ -1,8 +1,9 @@
 { lib, pkgs, config, ... }:
 let
-  disciplina-options = { name, ... }: {
+  listen-to-fw-port = str: if isNull str then [] else if lib.isPrefix "127.0.0.1" str then [] else [lib.toInt (lib.elemAt 1 (lib.splitString ":" str))];
+  disciplina-options = { name, config, ... }: {
     options = with lib; with types; {
-      config-file = mkOption { type = string; };
+      config-file = mkOption { type = string; default = "${config.package}/etc/disciplina/config.yaml"; };
       config-key = mkOption { type = string; };
       bind-port1 = mkOption { type = int; default = 4010; };
       bind-port2 = mkOption { type = int; default = 4011; };
@@ -11,7 +12,7 @@ let
       debug = mkEnableOption "debug";
       extraArgs = mkOption { type = listOf string; default = []; };
       openFirewall = mkEnableOption "firewall port opening";
-      package = mkOption { type = package; default = pkgs.disciplina-bin; };
+      package = mkOption { type = package; default = pkgs.disciplina-static; };
       peers = mkOption {
         type = listOf string; default = [];
       };
@@ -117,6 +118,6 @@ in
   config.networking.firewall = lib.mkMerge (lib.mapAttrsToList (name: cfg: with cfg; {
     allowedTCPPorts = lib.mkIf (openFirewall && type != "faucet") [
       bind-port1 bind-port2
-    ];
+    ] ++ (listen-to-fw-port cfg.witness.listen);
   }) config.disciplina);
 }
