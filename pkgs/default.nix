@@ -13,8 +13,8 @@ rec {
   # disciplina-faucet-frontend = callPackage (import "${fetchTarball https://github.com/DisciplinaOU/disciplina-faucet-frontend/archive/master.tar.gz}/release.nix") {};
   # disciplina-explorer-frontend = callPackage (import "${fetchTarball https://github.com/DisciplinaOU/disciplina-explorer-frontend/archive/master.tar.gz}/release.nix") {};
 
-  disciplina = (import <disciplina>);
-  disciplina-bin = disciplina.disciplina-bin;
+  inherit (import <disciplina>) disciplina-config disciplina-static;
+
   disciplina-faucet-frontend = callPackage <disciplina-faucet/release.nix> {};
   disciplina-explorer-frontend = callPackage <disciplina-explorer/release.nix> {};
 }
