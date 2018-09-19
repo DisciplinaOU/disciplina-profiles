@@ -66,7 +66,7 @@ in
 
       disciplina.faucet = {
         type = "faucet";
-        config-file = "${pkgs.disciplina-bin}/etc/disciplina/configuration.yaml";
+        config-file = "${pkgs.disciplina-config}/etc/disciplina/config.yaml";
         config-key = "clusterCi";
         faucet = {
           listen = "127.0.0.1:4014";
